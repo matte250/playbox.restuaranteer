@@ -4,8 +4,8 @@
     USE restu_db;
 
     CREATE TABLE users(
-        id VARCHAR(36)  -- guid
-        email VARCHAR(320) -- Maxmimum length of an email address defined by RFC 3696
-        [password] VARCHAR(120)
-        [name] varchar(40)
-    )
+        id VARCHAR(36) PRIMARY KEY,  -- guid
+        email VARCHAR(320), -- Maxmimum length of an email address defined by RFC 3696
+        password VARCHAR(120),
+        name varchar(40)
+    );
