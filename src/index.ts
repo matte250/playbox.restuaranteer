@@ -35,6 +35,13 @@ app.get("/home", async (_, res) => {
     }
 });
 
+app.get("/register", (_, res) => {
+    res.render('register')
+})
+
+app.post("/register", (params, res) => {
+    console.log("body", params.body, "query", params.query);
+})
 
 // start the Express server
 app.listen(Number(PORT), "0.0.0.0", () => {
