@@ -1,6 +1,6 @@
 import express from "express";
 import exphbs from "express-handlebars";
-import mysql from "mysql";
+import mysql from "mysql2";
 import { v4 as genGuid } from "uuid";
 
 const PORT = process.env.PORT || 3000;
@@ -70,7 +70,7 @@ app.get("/home", (_, res) => {
         (error, results, _fields) => {
             if (results !== undefined) {
                 res.render('home', {
-                    restuarants: results.map((x: any) => x.name),
+                    restuarants: "whatever"
                 });
             } else {
                 res.render("error", { error: error })
