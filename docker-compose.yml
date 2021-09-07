@@ -15,7 +15,7 @@ services:
   web:
     build: 
       context: ./
-      dockerfile: dev.Dockerfile
+      dockerfile: ./.devcontainer/Dockerfile
     environment: 
       DB_HOST: "db"
     volumes:
