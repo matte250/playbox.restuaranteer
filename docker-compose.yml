@@ -13,10 +13,16 @@ services:
     expose:
       - 3306
   web:
-    build: .
+    build: 
+      context: ./
+      dockerfile: dev.Dockerfile
     environment: 
       DB_HOST: "db"
+    volumes:
+      - "./:/usr/src/app"
     depends_on:
       - "db"
     ports:
       - "3000:3000"
+      - "9229:9229"
+      - "35729:35729"

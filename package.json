@@ -2,12 +2,12 @@
   "name": "restuaranteer",
   "version": "1.0.0",
   "description": "Collect a set of restuarant reviews to generate options.",
+  "exports": "./dist/index.js",
   "type": "module",
-  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "prestart": "npm run build",
-    "start": "node .",
+    "start-dev": "nodemon --config nodemon.json src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,10 +27,16 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/connect-livereload": "^0.5.32",
     "@types/express": "^4.17.13",
     "@types/express-handlebars": "^5.3.1",
+    "@types/livereload": "^0.9.1",
     "@types/mysql": "^2.15.19",
     "@types/uuid": "^8.3.1",
-    "typescript": "^4.3.5"
+    "nodemon": "^2.0.12",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.3.5",
+    "connect-livereload": "^0.6.1",
+    "livereload": "^0.9.3"
   }
 }

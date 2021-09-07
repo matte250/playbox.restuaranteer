@@ -1,0 +1,14 @@
+{
+    "restartable": "rs",
+    "ignore": [".git", "node_modules/", "dist/", "coverage/"],
+    "watch": ["src/"],
+    "execMap": {
+      "ts": "node --inspect=0.0.0.0 --loader ts-node/esm ./src/index.ts"
+    },
+    "env": {
+      "NODE_ENV": "development"
+    },
+    "ext": "js,json,ts,handlebars",
+    "delay": 250,
+    "signal": "SIGINT"
+}

@@ -4,8 +4,11 @@ import exphbs from "express-handlebars";
 import { v4 as guid } from "uuid";
 import { createSqlClient } from "./repositories/SqlClient.js";
 import { createUserRepository } from "./repositories/userRepository.js";
+import connectLiveReload from "connect-livereload";
+import livereload from "livereload";
 
 const PORT = process.env.PORT || 3000;
+const ENV = process.env.NODE_ENV || "development";
 
 const app = express();
 var hbs = exphbs.create({
@@ -21,6 +24,18 @@ await userRepository.createUser(guid(), guid(), "Mr Bean");
 app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars")
 app.set("views", "src/views")
+
+// Use live reload
+if (ENV == "development") {
+    const liveReloadServer = livereload.createServer();
+    liveReloadServer.server.once("connection", () => {
+        setTimeout(() => {
+            liveReloadServer.refresh("/");
+        }, 100);
+    });
+
+app.use(connectLiveReload())
+}
 // define a route handler for the default home page
 app.get("/home", async (_, res) => {
     const { result, error } = await sqlClient.query(`SELECT * FROM users;`);
