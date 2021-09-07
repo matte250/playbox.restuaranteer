@@ -1,7 +1,8 @@
-FROM node:15
+FROM node:16.8
 
 WORKDIR /usr/src/app
 COPY package*.json ./
+
 RUN npm ci
 
-ENTRYPOINT [ "npm", "run", "start-dev" ]
+ENTRYPOINT ["npm","run","start-dev"]
