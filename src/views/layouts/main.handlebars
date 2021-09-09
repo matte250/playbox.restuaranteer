@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 </head>
 
-<body>
+<body class="">
     <nav>
-        <div class="nav-wrapper" style="padding-left: 10px;">
+        <div class="nav-wrapper blue lighten-2" style="padding-left: 10px;">
             <a href="#" class="brand-logo">Restuaranteer.io</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a href="register">Register</a></li>
@@ -17,8 +17,31 @@
             </ul>
         </div>
     </nav>
-    {{{body}}}
+    <div class="section">
+        <div class="container">
+            {{#if error}}
+            <div class="red-text">
+                <div class="container">
+                    <h3>Error</h3>
+                    <p class="">{{error}}</p>
+                </div>
+            </div>
+            {{/if}}
+            {{#if msg}}
+            <div class="blue-text">
+                <div class="container">
+                    <p class="">{{msg}}</p>
+                </div>
+            </div>
+            {{/if}}
+            {{{body}}}
+        </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
+            ':35729/livereload.js?snipver=1"></' + 'script>')
+    </script>
 </body>
 
 </html>

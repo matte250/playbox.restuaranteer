@@ -11,8 +11,20 @@ const PORT = process.env.PORT || 3000;
 const ENV = process.env.NODE_ENV || "development";
 
 const app = express();
+
 var hbs = exphbs.create({
 });
+
+// Use live reload
+if (ENV == "development") {
+    app.use(connectLiveReload())
+    const liveReloadServer = livereload.createServer();
+    liveReloadServer.server.once("connection", () => {
+        setTimeout(() => {
+            liveReloadServer.refresh("/");
+        }, 100);
+    });
+}
 
 // Connect to DB
 const sqlClient = await createSqlClient();
@@ -25,17 +37,10 @@ app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars")
 app.set("views", "src/views")
 
-// Use live reload
-if (ENV == "development") {
-    const liveReloadServer = livereload.createServer();
-    liveReloadServer.server.once("connection", () => {
-        setTimeout(() => {
-            liveReloadServer.refresh("/");
-        }, 100);
-    });
+app.use(express.json());
+app.use(express.urlencoded());
 
-app.use(connectLiveReload())
-}
+
 // define a route handler for the default home page
 app.get("/home", async (_, res) => {
     const { result, error } = await sqlClient.query(`SELECT * FROM users;`);
@@ -56,6 +61,14 @@ app.get("/register", (_, res) => {
 
 app.post("/register", (params, res) => {
     console.log("body", params.body, "query", params.query);
+    const { email = "", name = "", password = ""} = { ...params.body };
+    res.render("register", {
+        error: "Password needs to be between 6 and 128 characters",
+        msg: "Account created!",
+        email,
+        name,
+        password
+    })
 })
 
 // start the Express server
