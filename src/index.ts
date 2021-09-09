@@ -2,10 +2,11 @@
 import express from "express";
 import exphbs from "express-handlebars";
 import { v4 as guid } from "uuid";
-import { createSqlClient } from "./repositories/SqlClient.js";
-import { createUserRepository } from "./repositories/userRepository.js";
+import { createSqlClient } from "./SqlClient.js";
 import connectLiveReload from "connect-livereload";
 import livereload from "livereload";
+import { registerControllers } from "./registerController.js";
+import { globalControllers } from "./controllers.js";
 
 const PORT = process.env.PORT || 3000;
 const ENV = process.env.NODE_ENV || "development";
@@ -29,9 +30,6 @@ if (ENV == "development") {
 // Connect to DB
 const sqlClient = await createSqlClient();
 
-const userRepository = createUserRepository(sqlClient);
-await userRepository.createUser(guid(), guid(), "Mr Bean");
-
 // Set template engine
 app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars")
@@ -54,22 +52,10 @@ app.get("/home", async (_, res) => {
         res.render("error", { error })
     }
 });
-
-app.get("/register", (_, res) => {
-    res.render('register')
-})
-
-app.post("/register", (params, res) => {
-    console.log("body", params.body, "query", params.query);
-    const { email = "", name = "", password = ""} = { ...params.body };
-    res.render("register", {
-        error: "Password needs to be between 6 and 128 characters",
-        msg: "Account created!",
-        email,
-        name,
-        password
-    })
-})
+var router = express.Router();
+registerControllers(router, globalControllers);
+app.use("/", router)
+// Register and map controllers to routes
 
 // start the Express server
 app.listen(Number(PORT), "0.0.0.0", () => {
