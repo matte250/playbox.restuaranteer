@@ -14,13 +14,13 @@ export type Controller = {
 type HttpMethod = "get" | "post" | "put" | "delete";
 const httpMethodsToMatch: HttpMethod[] = ["get", "post", "put", "delete"];
 
-const matchControllerToHttpMethod = (router: Router, path: string, conntrollerFunction: ControllerFunction, routerMatcher: IRouterMatcher<Router>, method: HttpMethod) => {
+const matchControllerToHttpMethod = (router: Router, path: string, conntrollerFunction: ControllerFunction, method: HttpMethod) => {
     if (conntrollerFunction !== undefined) 
         router[method](path, conntrollerFunction)
 }
 
 export const createRouter = (controllers: Controllers) => {
     var router = express.Router()
-    controllers.forEach(x => httpMethodsToMatch.forEach(httpMethod => matchControllerToHttpMethod(router, x.path, x[httpMethod], router[httpMethod], httpMethod)))
+    controllers.forEach(x => httpMethodsToMatch.forEach(httpMethod => matchControllerToHttpMethod(router, x.path, x[httpMethod], httpMethod)))
     return router;
 }
