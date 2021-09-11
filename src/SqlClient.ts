@@ -9,6 +9,12 @@ interface QueryResponse {
     result?: any;
     error?: any;
 }
+
+export type SqlResult<T> = {
+    result: T
+} | {
+    error: any
+}
 export interface SqlClient {
     query: (sql: string, placeholders?: {[key: string]: any}) => Promise<QueryResponse>;
 }

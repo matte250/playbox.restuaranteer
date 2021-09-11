@@ -1,6 +1,7 @@
-import { Controllers } from "../../createRouter.js"
+import { Controller, Controllers } from "../../createRouter.js"
 import { validate, IValidationDef } from "../../validation/validator.js"
 import { validators } from "../../validation/validators.js"
+import { IAuthRepo } from "./respository.js"
 
 const validationDef: IValidationDef = {
     email: {
@@ -9,7 +10,7 @@ const validationDef: IValidationDef = {
         $: validators.isEmail,
     },
     name: {
-        $req: true.valueOf,
+        $req: true,
         $lbl: "Name",
     },
     password: {
@@ -19,20 +20,22 @@ const validationDef: IValidationDef = {
     },
 }
 
-export const authController: Controllers = [
-    {
-        path: "/register",
-        get: (_, res) => res.render("register"),
-        post: (req, res) => {
-            const errors = validate(req.body, validationDef).onlyMsg()
-            const { email = "", name = "", password = "" } = { ...req.body };
-            res.render("register", {
-                errors,
-                msg: "Account created!",
-                email,
-                name,
-                password
-            })
-        },
-    }
-]
+export const createAuthController = (repo: IAuthRepo): Controllers => (
+    [
+        {
+            path: "/register",
+            get: (_, res) => res.render("register"),
+            post: (req, res) => {
+                const errors = validate(req.body, validationDef).onlyMsg()
+                const { email = "", name = "", password = "" } = { ...req.body };
+                res.render("register", {
+                    errors,
+                    msg: "Account created!",
+                    email,
+                    name,
+                    password
+                })
+            },
+        }
+    ]
+)

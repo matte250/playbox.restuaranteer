@@ -5,7 +5,8 @@ import { createSqlClient } from "./SqlClient.js";
 import connectLiveReload from "connect-livereload";
 import livereload from "livereload";
 import { createRouter } from "./createRouter.js";
-import { globalControllers } from "./controllers.js";
+import { createAuthController } from "./services/auth/controller.js";
+import { createAuthRepository } from "./services/auth/respository.js";
 
 const PORT = process.env.PORT || 3000;
 const ENV = process.env.NODE_ENV || "development";
@@ -51,8 +52,14 @@ app.get("/home", async (_, res) => {
         res.render("error", { error })
     }
 });
+// Create repositories and inject dependencies
+var authRepo = createAuthRepository(sqlClient)
+// Create controllers and inject dependencies
+var controllers = [
+    ...createAuthController(authRepo)
+]
 // Register and map controllers to routes
-var router = createRouter(globalControllers);
+var router = createRouter(controllers);
 app.use("/", router)
 
 

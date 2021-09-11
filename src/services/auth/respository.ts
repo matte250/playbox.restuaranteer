@@ -1,5 +1,5 @@
 import { v4 as guid } from "uuid";
-import { SqlClient } from "../../SqlClient";
+import { SqlClient, SqlResult } from "../../SqlClient";
 
 interface DbUser {
     id: string
@@ -7,7 +7,12 @@ interface DbUser {
     name: string
 }
 
-export const createAuthRepository = (client: SqlClient) => ({
+export interface IAuthRepo {
+    createUser: (email: string, password: string, name: string) => Promise<void>;
+    getUserWithCredentials: (email: string, password: string) => Promise<SqlResult<DbUser>>
+}
+
+export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
     createUser: async (email: string, password: string, name: string) => {
         await client.query(
             "INSERT INTO users (id, email, password, name) VALUES(:id,:email,:password,:name)",
