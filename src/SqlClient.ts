@@ -12,7 +12,6 @@ interface QueryResponse {
 
 export type SqlResult<T> = {
     result: T
-} | {
     error: any
 }
 export interface SqlClient {

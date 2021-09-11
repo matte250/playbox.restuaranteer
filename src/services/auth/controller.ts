@@ -25,16 +25,27 @@ export const createAuthController = (repo: IAuthRepo): Controllers => (
         {
             path: "/register",
             get: (_, res) => res.render("register"),
-            post: (req, res) => {
+            post: async (req, res) => {
                 const errors = validate(req.body, validationDef).onlyMsg()
                 const { email = "", name = "", password = "" } = { ...req.body };
+                if (errors.length == 0) {
+                    var q = await repo.createUser(email, password, name)
+                    if (!q.error) {
+                        res.redirect("home")
+                        return;
+                    }
+                    else {
+                        errors.push(q.error)
+                    }
+
+                }
                 res.render("register", {
                     errors,
-                    msg: "Account created!",
                     email,
                     name,
                     password
                 })
+
             },
         }
     ]

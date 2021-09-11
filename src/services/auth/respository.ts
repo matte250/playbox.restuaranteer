@@ -8,13 +8,13 @@ interface DbUser {
 }
 
 export interface IAuthRepo {
-    createUser: (email: string, password: string, name: string) => Promise<void>;
+    createUser: (email: string, password: string, name: string) => Promise<SqlResult<null>>;
     getUserWithCredentials: (email: string, password: string) => Promise<SqlResult<DbUser>>
 }
 
 export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
     createUser: async (email: string, password: string, name: string) => {
-        await client.query(
+        var { error } = await client.query(
             "INSERT INTO users (id, email, password, name) VALUES(:id,:email,:password,:name)",
             {
                 id: guid(),
@@ -23,6 +23,10 @@ export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
                 name,
             }
         )
+        return {
+            error,
+            result: null,
+        }
     },
     getUserWithCredentials: async (email: string, password: string) => {
         var { result, error } = await client.query(`
@@ -39,9 +43,6 @@ export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
             email,
             password
         });
-        if (error)
-            return { error }
-
-        return { result: (result[0] as DbUser) ?? null }
+        return { error, result: (result[0] as DbUser) ?? null }
     }
 });
