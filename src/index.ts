@@ -1,11 +1,10 @@
 
 import express from "express";
 import exphbs from "express-handlebars";
-import { v4 as guid } from "uuid";
 import { createSqlClient } from "./SqlClient.js";
 import connectLiveReload from "connect-livereload";
 import livereload from "livereload";
-import { registerControllers } from "./registerController.js";
+import { createRouter } from "./createRouter.js";
 import { globalControllers } from "./controllers.js";
 
 const PORT = process.env.PORT || 3000;
@@ -52,10 +51,10 @@ app.get("/home", async (_, res) => {
         res.render("error", { error })
     }
 });
-var router = express.Router();
-registerControllers(router, globalControllers);
-app.use("/", router)
 // Register and map controllers to routes
+var router = createRouter(globalControllers);
+app.use("/", router)
+
 
 // start the Express server
 app.listen(Number(PORT), "0.0.0.0", () => {

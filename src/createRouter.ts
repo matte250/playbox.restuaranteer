@@ -1,5 +1,5 @@
 
-import { Router, IRouterMatcher, Request, Response } from "express"
+import express, { Router, IRouterMatcher, Request, Response } from "express"
 type ControllerFunction = (req: Request, res: Response) => void;
 
 export type Controllers = Controller[];
@@ -19,10 +19,8 @@ const matchControllerToHttpMethod = (router: Router, path: string, conntrollerFu
         router[method](path, conntrollerFunction)
 }
 
-export const registerControllers = (router: Router, controllers: Controllers) =>
+export const createRouter = (controllers: Controllers) => {
+    var router = express.Router()
     controllers.forEach(x => httpMethodsToMatch.forEach(httpMethod => matchControllerToHttpMethod(router, x.path, x[httpMethod], router[httpMethod], httpMethod)))
-
-const exampleRoute: Controllers = [{
-    path: "/path",
-    get: (req, res) => res.render("home")
-}]
+    return router;
+}
