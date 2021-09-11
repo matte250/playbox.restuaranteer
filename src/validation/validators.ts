@@ -12,5 +12,3 @@ export const validators = createValidatorFunctions({
         msg: "Password needs to be 6 to 128 characters long"
     },
 })
-
-console.log(validators);
