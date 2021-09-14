@@ -5,7 +5,7 @@
 
     CREATE TABLE users(
         id VARCHAR(36) PRIMARY KEY,  -- guid
-        email VARCHAR(320), -- Maxmimum length of an email address defined by RFC 3696
+        email VARCHAR(320) UNIQUE, -- Maxmimum length of an email address defined by RFC 3696
         password VARCHAR(120),
         name varchar(40)
     );

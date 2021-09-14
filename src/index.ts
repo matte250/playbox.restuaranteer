@@ -38,20 +38,6 @@ app.set("views", "src/views")
 app.use(express.json());
 app.use(express.urlencoded());
 
-
-// define a route handler for the default home page
-app.get("/home", async (_, res) => {
-    const { result, error } = await sqlClient.query(`SELECT * FROM users;`);
-    if (result !== undefined) {
-        res.render('home', {
-            restuarants: JSON.stringify(
-                (result as any)
-            ),
-        });
-    } else {
-        res.render("error", { error })
-    }
-});
 // Create repositories and inject dependencies
 var authRepo = createAuthRepository(sqlClient)
 // Create controllers and inject dependencies
@@ -62,6 +48,17 @@ var controllers = [
 var router = createRouter(controllers);
 app.use("/", router)
 
+// define a route handler for the default home page
+app.get("/home", async (_, res) => {
+    const { type, obj } = await authRepo.fetchAllUsers() 
+    if (obj !== undefined) {
+        res.render('home', {
+            restuarants: JSON.stringify(
+                (obj as any)
+            ),
+        });
+    }
+});
 
 // start the Express server
 app.listen(Number(PORT), "0.0.0.0", () => {

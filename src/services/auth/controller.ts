@@ -28,24 +28,26 @@ export const createAuthController = (repo: IAuthRepo): Controllers => (
             post: async (req, res) => {
                 const errors = validate(req.body, validationDef).onlyMsg()
                 const { email = "", name = "", password = "" } = { ...req.body };
-                if (errors.length == 0) {
-                    var q = await repo.createUser(email, password, name)
-                    if (!q.error) {
-                        res.redirect("home")
-                        return;
-                    }
-                    else {
-                        errors.push(q.error)
-                    }
-
+                if (errors.length > 0) {
+                    res.render("register", {
+                        errors,
+                        email,
+                        name
+                    })
+                    return;
                 }
-                res.render("register", {
-                    errors,
-                    email,
-                    name,
-                    password
-                })
-
+                var { type } = await repo.createUser(email, password, name)
+                if (type == "userexists") {
+                    res.render("register", {
+                        errors: ["There is already an user with that email"],
+                        name,
+                    })
+                    return;
+                }
+                else if (type == "usercreated") {
+                    res.redirect("home")
+                    return;
+                }
             },
         }
     ]
