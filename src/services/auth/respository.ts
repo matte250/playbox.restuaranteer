@@ -34,8 +34,8 @@ export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
                 }
             )
             console.log(result[0][0]);
-            if(result[0] == true)
-                return { type: "userexists"}
+            if (result[0] == true)
+                return { type: "userexists" }
             await connection.query(
                 `
                     INSERT INTO users (id, email, password, name) VALUES(:id,:email,:password,:name)
@@ -47,14 +47,14 @@ export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
                     name,
                 }
             )
-            return { type: "usercreated"}
+            return { type: "usercreated" }
         }),
 
     fetchAllUsers: () =>
         client.useConnection(async connection => {
             var res = await connection.query(`SELECT id, email, name FROM users`)
-            return { type: "usersfetched", obj: res.result}
-        })     , 
+            return { type: "usersfetched", obj: res.result }
+        }),
     getUserWithCredentials: async (email: string, password: string) =>
         client.useConnection(async connection => {
             var { result } = await connection.query(`
@@ -73,8 +73,8 @@ export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
                 password
             });
             var possibleUser = result[0]
-            if(possibleUser == undefined)
-                return { type: "usernotauthorized"}
+            if (possibleUser == undefined)
+                return { type: "usernotauthorized" }
 
             return { type: "userfetched", obj: (possibleUser as DbUser) }
         })
