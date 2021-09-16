@@ -16,7 +16,6 @@ export interface IAuthRepo {
 type UserCreated = RepoFunctionResponse<"usercreated">
 type UserAlreadyExists = RepoFunctionResponse<"userexists">
 type UsersFetched = RepoFunctionResponseWithResult<"usersfetched", DbUser[]>
-
 type UserFetched = RepoFunctionResponseWithResult<"userfetched", DbUser>
 type UserNotAuthorized = RepoFunctionResponse<"usernotauthorized">
 
@@ -59,7 +58,7 @@ export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
     getUserWithCredentials: async (email: string, password: string) =>
         client.useConnection(async connection => {
             var { result } = await connection.query(`
-            SELECT TOP 1 
+            SELECT
                 id,
                 email,
                 name 
@@ -68,6 +67,7 @@ export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
             WHERE 
                 email = :email
                 AND password = :password
+            LIMIT 1;
             `, {
                 email,
                 password

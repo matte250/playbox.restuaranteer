@@ -1,6 +1,7 @@
 
 import express, { Router, IRouterMatcher, Request, Response } from "express"
-type ControllerFunction = (req: Request, res: Response) => void;
+import { IRequest } from "./types";
+type ControllerFunction = (req: IRequest, res: Response) => void;
 
 export type Controllers = Controller[];
 export type Controller = {
