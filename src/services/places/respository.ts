@@ -10,7 +10,7 @@ interface DbPlace {
 
 export interface IPlacesRepo {
     createPlace: (name: string, by: string, googleMapsLink?: string) => Promise<PlaceCreated>
-    editPlace: (id: string, name: string, by: string, googleMapsLink?: string) => Promise<PlaceEdited>
+    editPlace: (id: string, name: string, by: string, googleMapsLink?: string) => Promise<PlaceEdited | PlaceNotFound>
     getPlace: (id: string) => Promise<PlaceFetched | PlaceNotFound>
     getPlaces: () => Promise<PlacesFetched>
 }
@@ -25,8 +25,7 @@ type PlacesFetched = RepoFunctionResponseWithResult<"placesfetched", DbPlace[]>
 export const createPlacesRepository = (client: SqlClient): IPlacesRepo => ({
     createPlace: (name, createdBy, googleMapsLink) => client.useConnection(async connection => {
         await connection.query(`
-            INSERT INTO places (id, name, [createdBy], googleMapsLink)
-            VALUES(:id,:name,:createdBy,:googleMapsLink)
+            INSERT INTO places (id, name, createdBy, googleMapsLink) VALUES(:id,:name,:createdBy,:googleMapsLink)
         `, {
             id: guid(),
             name,
@@ -36,6 +35,20 @@ export const createPlacesRepository = (client: SqlClient): IPlacesRepo => ({
         return { type: "placecreated" };
     }),
     editPlace: (id, name, googleMapsLink) => client.useConnection(async connection => {
+        var { result } = await connection.query(
+            `
+            SELECT EXISTS(
+                SELECT *
+                FROM places
+                WHERE id = :id)
+            `,
+            {
+                id
+            }
+        )
+        if(result[0] === false)
+            return { type: "placenotfound"}
+        
         await connection.query(`
         UPDATE places
         SET
@@ -56,7 +69,7 @@ export const createPlacesRepository = (client: SqlClient): IPlacesRepo => ({
                 id,
                 name,
                 createdBy,
-                googleMapsLink, 
+                googleMapsLink
             FROM 
                 places
             WHERE 

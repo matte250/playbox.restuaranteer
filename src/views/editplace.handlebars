@@ -1,0 +1,23 @@
+<div class="row">
+    <form class="col s12 card" action="/places" method="PUT">
+        <div class="card-content">
+            <div class="card-title">
+                Edit place
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input name="name" id="name" type="text" class="validate" value="{{name}}">
+                    <label for="name">Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="googleMapsLink" name="googleMapsLink" type="text" class="validate" value="{{googleMapsLink}}">
+                    <label for="googleMapsLink">Google Maps link</label>
+                </div>
+            </div>
+            <button class="btn blue waves-effect waves-light" type="submit" name="action">Apply</button>
+        </div>
+
+    </form>
+</div>

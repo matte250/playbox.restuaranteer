@@ -68,7 +68,7 @@ export const createAuthController = (repo: IAuthRepo): Controllers => (
             path: "/login",
             get: (_, res) => res.render("login"),
             post: async (req, res) => {
-                const errors = validate(req.body, registerValidationDef).onlyMsg()
+                const errors = validate(req.body, loginValidationDef).onlyMsg()
                 const { email = "", password = "" } = req.body;
                 if (errors.length > 0)
                     return res.render("login", {

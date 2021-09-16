@@ -16,14 +16,14 @@ CREATE TABLE places(
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     name VARCHAR(40) NOT NULL,
     createdBy VARCHAR(36) NOT NULL,  
-    googleMapsLink VARCHAR(300), -- Meant for links, 300 is quite arbitary.
+    googleMapsLink VARCHAR(2000), -- Meant for links, value is quite arbitary.
     FOREIGN KEY (createdBy) REFERENCES users(id)
 );
 
 INSERT INTO places (id, name, createdBy, googleMapsLink) 
 VALUES(
     "37ad7834-e117-42d1-bf6c-760fff93c2e8",
-    "McDownlads",
+    "McDonalds",
     "19a5e8cd-edab-40ce-82ea-d4420ec6873a",
     "https://www.google.se/maps/search/mcdonalds/@57.7200922,12.8978709,12z"
 );

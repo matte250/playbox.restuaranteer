@@ -11,4 +11,8 @@ export const validators = createValidatorFunctions({
         func: (value) => !/\S{6,128}/.test(value),
         msg: "Password needs to be 6 to 128 characters long"
     },
+    isGoogleMapsLink: {
+        func: (value) => !/(https|http):\/\/(www\.|)google\.[a-z]+\/maps/.test(value),
+        msg: "Needs to be a valid Google Maps link"
+    }
 })

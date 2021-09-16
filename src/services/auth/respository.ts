@@ -33,8 +33,7 @@ export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
                     email
                 }
             )
-            console.log(result[0][0]);
-            if (result[0] == true)
+            if (result[0] === true)
                 return { type: "userexists" }
             await connection.query(
                 `
