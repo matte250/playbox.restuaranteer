@@ -1,5 +1,4 @@
-import { JsonWebTokenError } from "jsonwebtoken"
-import { Controller, Controllers } from "../../createRouter.js"
+import { Controllers } from "../../createRouter.js"
 import { validate, IValidationDef } from "../../validation/validator.js"
 import { validators } from "../../validation/validators.js"
 import { IAuthRepo } from "./respository.js"

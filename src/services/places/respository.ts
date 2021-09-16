@@ -1,5 +1,5 @@
 import { v4 as guid } from "uuid";
-import { RepoFunctionResponse, RepoFunctionResponseWithResult, SqlClient, SqlResult } from "../../SqlClient";
+import { RepoFunctionResponse, RepoFunctionResponseWithResult, SqlClient } from "../../SqlClient";
 
 interface DbPlace {
     id: string
