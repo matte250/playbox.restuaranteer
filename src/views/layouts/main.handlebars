@@ -10,21 +10,25 @@
 <body class="">
     <nav>
         <div class="nav-wrapper blue lighten-2" style="padding-left: 10px;">
-            <a href="home" class="brand-logo">Restuaranteer.io</a>
+            <a href="home" class="left brand-logo">Restuaranteer.io</a>
             <ul id="nav-mobile" class="right">
                 {{#if user}}
                 <li>
                     <form action="/logout" method="POST">
-                        <button class="waves-effect white-text btn-flat" name="action" type="submit">Logout</button>
-                    </form>>
+                        <button style="margin-right: 10px" class="btn red waves-effect" name="action" type="submit">LOGOUT</button>
+                    </form>
                 </li>
                 {{else}}
-                <li><a href="register">Register</a></li>
-                <li><a href="login">Login</a></li>
+                <li><a href="register">REGISTER</a></li>
+                <li><a href="login">LOGIN</a></li>
                 {{/if}}
             </ul>
         </div>
     </nav>
+    <div style="padding: 2px 5px" class="grey lighten-2">
+        <p class="red-text" style="margin: 0 5px 0 0;">USERID: {{user.id}}</p>
+        <p class="red-text" style="margin: 0;">NAME: {{user.name}}</p>
+    </div>
     <div class="section">
         <div class="container">
             {{#if errors}}
