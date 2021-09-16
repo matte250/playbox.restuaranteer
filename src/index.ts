@@ -1,15 +1,16 @@
 
-import express, { NextFunction, Request, Response } from "express";
+import express, { NextFunction, Response } from "express";
 import exphbs from "express-handlebars";
 import { createSqlClient } from "./SqlClient.js";
 import connectLiveReload from "connect-livereload";
 import livereload from "livereload";
 import { createRouter } from "./createRouter.js";
 import { createAuthController } from "./services/auth/controller.js";
-import { createAuthRepository } from "./services/auth/respository.js"
+import { createAuthRepository } from "./services/auth/respository.js";
+import { createPlacesRepository } from "./services/places/respository.js";
 import jwt from "jsonwebtoken";
-import cookieParser from "cookie-parser"
-import { IRequest } from "./types"
+import cookieParser from "cookie-parser";
+import { IRequest } from "./types";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "dev-access-token"
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "dev-refresh-token"
@@ -64,6 +65,7 @@ app.use(authenticate)
 
 // Create repositories and inject dependencies
 var authRepo = createAuthRepository(sqlClient)
+var placesRepo = createPlacesRepository(sqlClient)
 // Create controllers and inject dependencies
 var controllers = [
     ...createAuthController(authRepo)
