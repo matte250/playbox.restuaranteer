@@ -1,0 +1,27 @@
+<ul class="collection with-header">
+    <li class="collection-header"
+        style="
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        align-items: center;
+        ">
+        <h3>Places</h3>
+        <a href="places/add" class="btn-floating btn-large waves-effect waves-light red">
+            <i class="material-icons">add</i>
+        </a>
+    </li>
+    {{#each places}}
+        <li class="collection-item">
+            <div>
+                <div>
+                    <h5>{{this.name}}</h5>
+                    {{#if this.googleMapsLink}}
+                    <a style="word-break: break-all;" href="{{this.googleMapsLink}}">{{this.googleMapsLink}}</a>
+                    {{/if}}
+                </div>
+                <a href="places/edit/{{this.id}}" class="secondary-content">Edit</a>
+            </div>
+        </li>
+    {{/each}}
+</ul>

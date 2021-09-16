@@ -11,6 +11,7 @@ import { createPlacesRepository } from "./services/places/respository.js";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { IRequest } from "./types";
+import { createPlacesController } from "./services/places/controller.js";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "dev-access-token"
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "dev-refresh-token"
@@ -68,7 +69,8 @@ var authRepo = createAuthRepository(sqlClient)
 var placesRepo = createPlacesRepository(sqlClient)
 // Create controllers and inject dependencies
 var controllers = [
-    ...createAuthController(authRepo)
+    ...createAuthController(authRepo),
+    ...createPlacesController(placesRepo)
 ]
 // Register and map controllers to routes
 var router = createRouter(controllers);

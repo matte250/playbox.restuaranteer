@@ -4,7 +4,7 @@ import { RepoFunctionResponse, RepoFunctionResponseWithResult, SqlClient } from 
 interface DbPlace {
     id: string
     name: string
-    by: string
+    createdBy: string
     googleMapsLink?: string
 }
 
@@ -19,18 +19,18 @@ type PlaceCreated = RepoFunctionResponse<"placecreated">
 type PlaceEdited = RepoFunctionResponse<"placeedited">
 type PlaceFetched = RepoFunctionResponseWithResult<"placefetched", DbPlace>
 type PlaceNotFound = RepoFunctionResponse<"placenotfound">
-type PlacesFetched = RepoFunctionResponse<"placesfetched">
+type PlacesFetched = RepoFunctionResponseWithResult<"placesfetched", DbPlace[]>
 
 
 export const createPlacesRepository = (client: SqlClient): IPlacesRepo => ({
-    createPlace: (name, by, googleMapsLink) => client.useConnection(async connection => {
+    createPlace: (name, createdBy, googleMapsLink) => client.useConnection(async connection => {
         await connection.query(`
-            INSERT INTO places (id, name, by, googleMapsLink)
-            VALUES(:id,:name,:by,:googleMapsLink)
+            INSERT INTO places (id, name, [createdBy], googleMapsLink)
+            VALUES(:id,:name,:createdBy,:googleMapsLink)
         `, {
             id: guid(),
             name,
-            by,
+            createdBy,
             googleMapsLink,
         })
         return { type: "placecreated" };
@@ -55,7 +55,7 @@ export const createPlacesRepository = (client: SqlClient): IPlacesRepo => ({
             SELECT
                 id,
                 name,
-                by,
+                createdBy,
                 googleMapsLink, 
             FROM 
                 places
@@ -73,7 +73,7 @@ export const createPlacesRepository = (client: SqlClient): IPlacesRepo => ({
     }),
     getPlaces: () =>
         client.useConnection(async connection => {
-            var res = await connection.query(`SELECT id, name, by, googleMapsLink FROM places`)
+            var res = await connection.query(`SELECT id, name, createdBy, googleMapsLink FROM places`)
             return { type: "placesfetched", obj: res.result }
     }),
 })

@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>Restuaranteer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
 <body class="">
@@ -13,10 +14,11 @@
             <a href="home" class="left brand-logo">Restuaranteer.io</a>
             <ul id="nav-mobile" class="right">
                 {{#if user}}
+                <li><a href="places">PLACES</a></li>
                 <li>
                     <form action="/logout" method="POST">
                         <button style="margin-right: 10px" class="btn red waves-effect" name="action" type="submit">LOGOUT</button>
-                    </form>
+                    </form>         
                 </li>
                 {{else}}
                 <li><a href="register">REGISTER</a></li>
