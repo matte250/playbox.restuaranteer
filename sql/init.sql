@@ -31,20 +31,20 @@ VALUES(
 CREATE TABLE experiences(
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     at VARCHAR(36) NOT NULL,
-    when DATETIME NOT NULL,
-    [createdBy] VARCHAR(36) NOT NULL,
+    `when` DATETIME NOT NULL,
+    createdBy VARCHAR(36) NOT NULL,
     FOREIGN KEY (at) REFERENCES places(id),
     FOREIGN KEY (createdBy) REFERENCES users(id)
 );
 
 CREATE TABLE reviews(
     id VARCHAR(36) NOT NULL PRIMARY KEY,
-    [createdBy] VARCHAR(36) NOT NULL,
+    createdBy VARCHAR(36) NOT NULL,
     score FLOAT NOT NULL,
     created DATETIME NOT NULL,
     experience VARCHAR(36) NOT NULL,
     mealName VARCHAR(40) NOT NULL, -- Arbitrary length
-    note TEXT -- Maybe use VARCHAR here? Need to read up on MySql data types
+    note TEXT, -- Maybe use VARCHAR here? Need to read up on MySql data types
     FOREIGN KEY (createdBy) REFERENCES users(id),
     FOREIGN KEY (experience) REFERENCES experiences(id),
 );

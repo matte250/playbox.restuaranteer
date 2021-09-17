@@ -17,7 +17,7 @@ export const validate = (value: any, validationDef: IValidationDef, key?: string
             onlyMsg
         }
 
-    const defKeys = Object.keys(validationDef).filter(x => !x.startsWith("$") && value[x] !== undefined)
+    const defKeys = Object.keys(validationDef).filter(x => !x.startsWith("$"))
 
     defKeys.forEach(x => {
         const res = validate(value[x as any], validationDef[x], `${key}.${x}`).failed

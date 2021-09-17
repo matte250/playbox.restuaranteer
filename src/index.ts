@@ -8,6 +8,8 @@ import { createRouter } from "./createRouter.js";
 import { createAuthController } from "./services/auth/controller.js";
 import { createAuthRepository } from "./services/auth/respository.js";
 import { createPlacesRepository } from "./services/places/respository.js";
+import { createExperiencesController } from "./services/experiences/controller.js";
+import { createExperiencesRepository } from "./services/experiences/respository.js"
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { IRequest } from "./types";
@@ -67,10 +69,12 @@ app.use(authenticate)
 // Create repositories and inject dependencies
 var authRepo = createAuthRepository(sqlClient)
 var placesRepo = createPlacesRepository(sqlClient)
+var experiencesRepo = createExperiencesRepository(sqlClient)
 // Create controllers and inject dependencies
 var controllers = [
     ...createAuthController(authRepo),
-    ...createPlacesController(placesRepo)
+    ...createPlacesController(placesRepo),
+    ...createExperiencesController(experiencesRepo, placesRepo),
 ]
 // Register and map controllers to routes
 var router = createRouter(controllers);

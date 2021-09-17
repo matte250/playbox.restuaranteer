@@ -1,0 +1,28 @@
+<div class="row">
+    <form class="col s12 card" action="/experiences" method="POST" id="form">
+        <div class="card-content">
+            <div class="card-title">
+                Add Experience
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <select form="form" name="at" id="at">
+                        <option value="" disabled selected>Choose your option</option>
+                        {{#each places}}
+                        <option value="{{this.id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                    <label for="at">Place</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <label style="position: revert; font-size: 11.2px;" for="when">When</label>
+                    <input type="datetime-local" name="when" id="when" class="validate" value="{{when}}">
+                </div>
+
+            </div>
+            <button class="btn blue waves-effect waves-light" type="submit" name="action">Add</button>
+        </div>
+    </form>
+</div>

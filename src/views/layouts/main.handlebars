@@ -15,6 +15,7 @@
             <ul id="nav-mobile" class="right">
                 {{#if user}}
                 <li><a href="/places">PLACES</a></li>
+                <li><a href="/experiences">EXPERIENCES</a></li>
                 <li>
                     <form action="/logout" method="POST">
                         <button style="margin-right: 10px" class="btn red waves-effect" name="action" type="submit">LOGOUT</button>
@@ -58,6 +59,7 @@
         document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
             ':35729/livereload.js?snipver=1"></' + 'script>')
     </script>
+    <script>M.AutoInit();</script>
 </body>
 
 </html>
