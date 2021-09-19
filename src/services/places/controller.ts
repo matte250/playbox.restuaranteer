@@ -40,8 +40,24 @@ export const createPlacesController = (repo: IPlacesRepo): Controllers => (
 
         },
         {
-            path: "/places/:id",
-            put: async (req, res) => {
+            path: "/addplaces",
+            get: async (_, res) => {
+                return res.render("addplace")
+            }
+        },
+        {
+            path: "/editplaces/:id",
+            get: async (req, res) => {
+                const { id = "" } = req.params;
+                const result = await repo.getPlace(id)
+                if (result.type === "placenotfound")
+                    return res.sendStatus(404)
+
+                return res.render("editplace", {
+                    ...result.obj,
+                })
+            },
+            post: async (req, res) => {
                 if (!req.context.user)
                     return res.sendStatus(401);
 
@@ -59,27 +75,9 @@ export const createPlacesController = (repo: IPlacesRepo): Controllers => (
                 if (result.type == "placenotfound")
                     return res.sendStatus(404)
 
-                return res.redirect("places")
+                return res.redirect("/places")
             }
-        },
-        {
-            path: "/addplaces",
-            get: async (_, res) => {
-                return res.render("addplace")
-            }
-        },
-        {
-            path: "/editplaces/:id",
-            get: async (req, res) => {
-                const { id = "" } = req.params;
-                const result = await repo.getPlace(id)
-                if (result.type === "placenotfound")
-                    return res.sendStatus(404)
 
-                return res.render("editplace", {
-                    ...result.obj,
-                })
-            }
         },
     ]
 )
