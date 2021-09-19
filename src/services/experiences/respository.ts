@@ -44,7 +44,7 @@ export const createExperiencesRepository = (client: SqlClient): IExperiencesRepo
         })
         return { type: "experiencecreated" };
     }),
-    editExperience: (id, when) => client.useConnection(async connection => {
+    editExperience: (id, at, when) => client.useConnection(async connection => {
         var { result } = await connection.query(
             `
             SELECT EXISTS(
@@ -60,16 +60,17 @@ export const createExperiencesRepository = (client: SqlClient): IExperiencesRepo
             return { type: "experiencenotfound"}
         
         await connection.query(`
-        UPDATE places
-        SET
-            at = :at,
-            when = :when
-        WHERE
-            id = :id
-        `, {
-            id,
-            when
-        })
+            UPDATE experiences
+            SET
+                at = :at,
+                \`when\` = :when
+            WHERE
+                id = :id
+            `, {
+                id,
+                at,
+                when
+            })
         return { type: "experienceupdated" };
     }),
     getExperience: (id) => client.useConnection(async connection => {

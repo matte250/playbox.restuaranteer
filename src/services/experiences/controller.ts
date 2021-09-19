@@ -54,30 +54,10 @@ export const createExperiencesController = (repo: IExperiencesRepo, placesRepo: 
             },
         },
         {
-            path: "/experiences/:id",
-            put: async (req, res) => {
-                if (!req.context.user)
-                    return res.sendStatus(401);
-
-                const errors = validate(req.body, addExperienceValidator).onlyMsg()
-                const { at = "", when = "" } = req.body;
-                const { id = "" } = req.params; 
-                if (errors.length > 0)
-                    return res.render("editexperience", {
-                        errors,
-                        at,
-                        when,
-                    })
-
-                await repo.editExperience(id, at, when);
-                return res.redirect("experiences")
-            },
-        },
-        {
             path: "/addexperience",
             get: async (_, res) => {
                 const placesResult = await placesRepo.getPlaces();
-                return res.render("addexperience", { places: placesResult.obj, when: newAppLocaleDateTimeString()})
+                return res.render("addexperience", { places: placesResult.obj, when: newAppLocaleDateTimeString() })
             }
         },
         {
@@ -87,14 +67,36 @@ export const createExperiencesController = (repo: IExperiencesRepo, placesRepo: 
                 const experienceResult = await repo.getExperience(id);
                 if (experienceResult.type === "experiencenotfound")
                     return res.sendStatus(404)
-                
+
                 const placesResult = await placesRepo.getPlaces();
                 return res.render("editexperience", {
                     ...experienceResult.obj,
                     when: toLocaleDatetimeString(experienceResult.obj.when),
-                    places: placesResult.obj.map(x => ({ ...x, selected: experienceResult.obj.at.id === x.id ? "selected" : ""})),
+                    places: placesResult.obj.map(x => {
+                        if(x.id === experienceResult.obj.at.id)
+                            return { ...x, selected: true}
+                        else
+                            return { ...x }
+                    }),
                 })
-            }
+            },
+            post: async (req, res) => {
+                if (!req.context.user)
+                    return res.sendStatus(401);
+
+                const errors = validate(req.body, addExperienceValidator).onlyMsg()
+                const { at = "", when = "" } = req.body;
+                const { id = "" } = req.params;
+                if (errors.length > 0)
+                    return res.render("editexperience", {
+                        errors,
+                        at,
+                        when,
+                    })
+
+                await repo.editExperience(id, at, when);
+                return res.redirect("/experiences")
+            },
         },
     ]
 )

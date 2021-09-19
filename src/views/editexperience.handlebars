@@ -1,14 +1,14 @@
 <div class="row">
-    <form class="col s12 card" action="/experiences" method="PUT" id="form">
+    <form class="col s12 card" action="/editexperience/{{id}}" method="POST" id="form">
         <div class="card-content">
             <div class="card-title">
                 Edit Experience
             </div>
             <div class="row">
                 <div class="input-field col s12">
-                    <select form="form" name="at" id="at" value="{{at}}">
+                    <select form="form" name="at" id="at">
                         {{#each places}}
-                        <option selected="{{this.selected}}" value="{{this.id}}">{{this.name}}</option>
+                        <option {{#if this.selected}}selected{{/if}} value="{{this.id}}">{{this.name}}</option>
                         {{/each}}
                     </select>
                     <label for="at">Place</label>
