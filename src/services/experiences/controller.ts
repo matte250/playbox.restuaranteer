@@ -32,7 +32,7 @@ export const createExperiencesController = (repo: IExperiencesRepo, placesRepo: 
 
                 return res.render("experiences", {
                     experiences: obj.map(x =>
-                        ({ ...x, when: x.when.toISOString() })
+                        ({ ...x, when: x.when.toLocaleString("se")})
                     )
                 })
             },
