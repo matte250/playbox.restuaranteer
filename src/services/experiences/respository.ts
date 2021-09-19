@@ -8,15 +8,6 @@ interface DbExperience {
     when: Date
 }
 
-/*
-    id VARCHAR(36) NOT NULL PRIMARY KEY,
-    at VARCHAR(36) NOT NULL,
-    when DATETIME NOT NULL,
-    [createdBy] VARCHAR(36) NOT NULL,
-    FOREIGN KEY (at) REFERENCES places(id),
-    FOREIGN KEY (createdBy) REFERENCES users(id)
-*/
-
 export interface IExperiencesRepo {
     createExperience: (at: string, when: Date, createdBy: string) => Promise<ExperienceCreated>
     editExperience: (id: string, at: string, when: Date) => Promise<ExperienceUpdated | ExperienceNotFound>
