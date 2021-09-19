@@ -19,19 +19,15 @@ interface DbExperience {
 
 export interface IExperiencesRepo {
     createExperience: (at: string, when: Date, createdBy: string) => Promise<ExperienceCreated>
-    /*
-    editPlace: (id: string, name: string, by: string, googleMapsLink?: string) => Promise<PlaceEdited | PlaceNotFound>
-    getPlace: (id: string) => Promise<PlaceFetched | PlaceNotFound>
-    */
+    editExperience: (id: string, at: string, when: Date) => Promise<ExperienceUpdated | ExperienceNotFound>
+    getExperience: (id: string) => Promise<ExperienceFetched | ExperienceNotFound>
     getExperiences: () => Promise<ExperiencesFetched>
 }
 
 type ExperienceCreated = RepoFunctionResponse<"experiencecreated">
-/*
-type PlaceEdited = RepoFunctionResponse<"placeedited">
-type PlaceFetched = RepoFunctionResponseWithResult<"placefetched", DbPlace>
-type PlaceNotFound = RepoFunctionResponse<"placenotfound">
-*/
+type ExperienceUpdated = RepoFunctionResponse<"experienceupdated">
+type ExperienceFetched = RepoFunctionResponseWithResult<"experiencefetched", DbExperience>
+type ExperienceNotFound = RepoFunctionResponse<"experiencenotfound">
 type ExperiencesFetched = RepoFunctionResponseWithResult<"experiencesfetched", DbExperience[]>
 
 
@@ -48,13 +44,12 @@ export const createExperiencesRepository = (client: SqlClient): IExperiencesRepo
         })
         return { type: "experiencecreated" };
     }),
-    /*
-    editPlace: (id, name, googleMapsLink) => client.useConnection(async connection => {
+    editExperience: (id, when) => client.useConnection(async connection => {
         var { result } = await connection.query(
             `
             SELECT EXISTS(
                 SELECT *
-                FROM places
+                FROM experiences
                 WHERE id = :id)
             `,
             {
@@ -62,44 +57,56 @@ export const createExperiencesRepository = (client: SqlClient): IExperiencesRepo
             }
         )
         if(result[0] === false)
-            return { type: "placenotfound"}
+            return { type: "experiencenotfound"}
         
         await connection.query(`
         UPDATE places
         SET
-            name = :name,
-            googleMapsLink = :googleMapsLink
+            at = :at,
+            when = :when
         WHERE
             id = :id
         `, {
             id,
-            name,
-            googleMapsLink,
+            when
         })
-        return { type: "placeedited" };
+        return { type: "experienceupdated" };
     }),
-    getPlace: (id) => client.useConnection(async connection => {
+    getExperience: (id) => client.useConnection(async connection => {
         var { result } = await connection.query(`
             SELECT
-                id,
-                name,
-                createdBy,
-                googleMapsLink
+                experiences.id,
+                experiences.when,
+                places.id as placeId,
+                places.name as placeName,
+                places.googleMapsLink as placeGoogleMapsLink,
+                places.createdBy as placeCreatedBy
             FROM 
-                places
+                experiences
+            LEFT JOIN 
+                places on experiences.at = places.id
             WHERE 
-                id = :id
-            LIMIT 1;
-            `, {
-            id
-        });
-        var possiblePlace = result[0]
-        if (possiblePlace == undefined)
-            return { type: "placenotfound" }
+                experiences.id = :id
+            LIMIT 1`, {
+                id,
+            })
+        var possibleExperience = result[0]
+        if (possibleExperience == undefined)
+            return { type: "experiencenotfound" }
 
-        return { type: "placefetched", obj: (possiblePlace as DbPlace) }
+        const mappedObj: DbExperience = {
+            id: possibleExperience.id,
+            when: possibleExperience.when,
+            at: {
+                id: possibleExperience.placeId,
+                name: possibleExperience.placeName,
+                googleMapsLink: possibleExperience.placeGoogleMapsLink,
+                createdBy: possibleExperience.placeCreatedBy
+            }
+        }
+
+        return { type: "experiencefetched", obj: (mappedObj as DbExperience) }
     }),
-    */
     getExperiences: () =>
         client.useConnection(async connection => {
             var res = await connection.query(`

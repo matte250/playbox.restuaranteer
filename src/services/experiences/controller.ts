@@ -3,6 +3,7 @@ import { validators } from "../../validation/validators.js"
 import { Controllers } from "../../createRouter.js"
 import { IExperiencesRepo } from "./respository.js"
 import { IPlacesRepo } from "../places/respository.js"
+import { newAppLocaleDateTimeString, toLocaleDatetimeString } from "../../dateutils.js";
 
 /*
     id VARCHAR(36) NOT NULL PRIMARY KEY,
@@ -12,7 +13,7 @@ import { IPlacesRepo } from "../places/respository.js"
     FOREIGN KEY (at) REFERENCES places(id),
     FOREIGN KEY (createdBy) REFERENCES users(id)
 */
-const addExperience: IValidationDef = {
+const addExperienceValidator: IValidationDef = {
     at: {
         $req: true,
         $lbl: "Place",
@@ -29,17 +30,20 @@ export const createExperiencesController = (repo: IExperiencesRepo, placesRepo: 
             get: async (_, res) => {
                 const { obj } = await repo.getExperiences();
 
-                return res.render("experiences", { experiences: obj })
+                return res.render("experiences", {
+                    experiences: obj.map(x =>
+                        ({ ...x, when: x.when.toISOString() })
+                    )
+                })
             },
-    
             post: async (req, res) => {
                 if (!req.context.user)
                     return res.sendStatus(401);
 
-                const errors = validate(req.body, addExperience).onlyMsg()
+                const errors = validate(req.body, addExperienceValidator).onlyMsg()
                 const { at = "", when = "" } = req.body;
                 if (errors.length > 0)
-                    return res.render("addplace", {
+                    return res.render("addexperience", {
                         errors,
                         at,
                         when,
@@ -48,59 +52,49 @@ export const createExperiencesController = (repo: IExperiencesRepo, placesRepo: 
                 await repo.createExperience(at, when, req.context.user.id);
                 return res.redirect("experiences")
             },
-            
         },
-        /*
         {
-            path: "/places/:id",
+            path: "/experiences/:id",
             put: async (req, res) => {
                 if (!req.context.user)
                     return res.sendStatus(401);
 
-                const errors = validate(req.body, addPlaceValidator).onlyMsg()
-                const { name = "", googleMapsLink = "" } = req.body;
-                const { id = "" } = req.params;
+                const errors = validate(req.body, addExperienceValidator).onlyMsg()
+                const { at = "", when = "" } = req.body;
+                const { id = "" } = req.params; 
                 if (errors.length > 0)
-                    return res.render("editplace", {
+                    return res.render("editexperience", {
                         errors,
-                        name,
-                        googleMapsLink,
+                        at,
+                        when,
                     })
 
-                const result = await repo.editPlace(id, name, googleMapsLink);
-                if (result.type == "placenotfound")
-                    return res.sendStatus(404)
-
-                return res.redirect("places")
-            }
+                await repo.editExperience(id, at, when);
+                return res.redirect("experiences")
+            },
         },
-        */
         {
             path: "/addexperience",
             get: async (_, res) => {
                 const placesResult = await placesRepo.getPlaces();
-                const now = new Date();
-                now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
-                now.setMilliseconds(null);
-                const isoString = now.toISOString();
-                
-                // TODO: Fix this disgusting mess called datetime handling
-                return res.render("addexperience", { places: placesResult.obj, when: isoString.substring(0, (isoString.indexOf("T")|0) + 6|0)/*.toLocaleString("se", options as any)*/ })
+                return res.render("addexperience", { places: placesResult.obj, when: newAppLocaleDateTimeString()})
             }
         },
-        /*
         {
-            path: "/editplaces/:id",
+            path: "/editexperience/:id",
             get: async (req, res) => {
                 const { id = "" } = req.params;
-                const result = await repo.getPlace(id)
-                if (result.type === "placenotfound")
+                const experienceResult = await repo.getExperience(id);
+                if (experienceResult.type === "experiencenotfound")
                     return res.sendStatus(404)
-
-                return res.render("editplace", {
-                    ...result.obj,
+                
+                const placesResult = await placesRepo.getPlaces();
+                return res.render("editexperience", {
+                    ...experienceResult.obj,
+                    when: toLocaleDatetimeString(experienceResult.obj.when),
+                    places: placesResult.obj.map(x => ({ ...x, selected: experienceResult.obj.at.id === x.id ? "selected" : ""})),
                 })
             }
         },
-    */]
+    ]
 )
