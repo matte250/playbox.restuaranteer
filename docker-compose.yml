@@ -17,7 +17,7 @@ services:
     build: 
       context: ./
       dockerfile: ./.devcontainer/Dockerfile
-    environment: 
+    environment:
       DB_HOST: "db"
     volumes:
       - "./:/usr/src/app"
