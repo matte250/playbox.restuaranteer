@@ -2,7 +2,7 @@ import { v4 as guid } from "uuid";
 import { RepoFunctionResponse, RepoFunctionResponseWithResult, SqlClient } from "../../SqlClient";
 import { DbPlace } from "../places/respository";
 
-interface DbExperience {
+export interface DbExperience {
     id: string
     at: DbPlace
     when: Date
