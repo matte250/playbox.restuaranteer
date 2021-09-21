@@ -1,8 +1,9 @@
-FROM node:16.8
+FROM node:16.8 AS builder
+
 
 WORKDIR /usr/src/app
 COPY package*.json ./
 
 RUN npm ci
 
-ENTRYPOINT ["npm","run","start-dev"]
+CMD tail -f /dev/null
