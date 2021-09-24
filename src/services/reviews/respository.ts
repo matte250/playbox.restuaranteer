@@ -5,6 +5,7 @@ import { DbExperience } from "../experiences/respository"
 export interface DbReview {
     id: string
     experience: DbExperience,
+    createdByName: string,
     score: number,
     created: Date,
     mealName: string,
@@ -83,12 +84,12 @@ export const createReviewsRepository = (client: SqlClient): IReviewsRepo => ({
                 reviews.id,
                 reviews.score,
                 reviews.mealName,
-                reveiws.note,
+                reviews.note,
                 experiences.id as experienceId,
                 experiences.\`when\` as experienceWhen,
                 places.id as atId,
                 places.name as atName,
-                places.googleMapsLink as at.googleMapsLink
+                places.googleMapsLink as atgoogleMapsLink
             FROM 
                 reviews
             LEFT JOIN
@@ -114,20 +115,38 @@ export const createReviewsRepository = (client: SqlClient): IReviewsRepo => ({
                 reviews.id,
                 reviews.score,
                 reviews.mealName,
-                reveiws.note,
+                reviews.note,
+                users.name as createdByName,
                 experiences.id as experienceId,
                 experiences.\`when\` as experienceWhen,
                 places.id as atId,
                 places.name as atName,
-                places.googleMapsLink as at.googleMapsLink
+                places.googleMapsLink as atgoogleMapsLink
             FROM 
                 reviews
+            LEFT JOIN
+                users ON reviews.createdBy = users.id
             LEFT JOIN
                 experiences ON reviews.experience = experiences.id
             LEFT JOIN
                 places ON experiences.at = places.id
             `)
-            return { type: "reviewsfetched", obj: res.result }
+            return { type: "reviewsfetched", obj: (res.result as any[]).map(x => ({
+                id: x.id,
+                score: x.score,
+                mealName: x.mealName,
+                note: x.note,
+                createdByName: x.createdByName,
+                experience: {
+                    id: x.experienceId,
+                    when: x.experienceWhen,
+                    at: {
+                        id: x.atId,
+                        name: x.atName,
+                        googleMapsLink: x.atGoogleMapsLink,
+                    }
+                }
+            })) }
         }),
     getReviewsByUser: (userId) =>
         client.useConnection(async connection => {

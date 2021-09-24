@@ -14,6 +14,8 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { IRequest } from "./types";
 import { createPlacesController } from "./services/places/controller.js";
+import { createReviewsRepository } from "./services/reviews/respository.js";
+import { createReviewsController } from "./services/reviews/controller.js"
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "dev-access-token"
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "dev-refresh-token"
@@ -70,11 +72,13 @@ app.use(authenticate)
 var authRepo = createAuthRepository(sqlClient)
 var placesRepo = createPlacesRepository(sqlClient)
 var experiencesRepo = createExperiencesRepository(sqlClient)
+var reviewsRepo = createReviewsRepository(sqlClient)
 // Create controllers and inject dependencies
 var controllers = [
     ...createAuthController(authRepo),
     ...createPlacesController(placesRepo),
     ...createExperiencesController(experiencesRepo, placesRepo),
+    ...createReviewsController(reviewsRepo, placesRepo, experiencesRepo)
 ]
 // Register and map controllers to routes
 var router = createRouter(controllers);
