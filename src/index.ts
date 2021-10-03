@@ -16,11 +16,7 @@ import { IRequest } from "./types";
 import { createPlacesController } from "./services/places/controller.js";
 import { createReviewsRepository } from "./services/reviews/respository.js";
 import { createReviewsController } from "./services/reviews/controller.js"
-
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "dev-access-token"
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "dev-refresh-token"
-const PORT = process.env.PORT || 3000;
-const ENV = process.env.NODE_ENV || "development";
+import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from "./env.js";
 
 const app = express();
 

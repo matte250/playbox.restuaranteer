@@ -3,9 +3,7 @@ import { validate, IValidationDef } from "../../validation/validator.js"
 import { validators } from "../../validation/validators.js"
 import { IAuthRepo } from "./respository.js"
 import jwt from "jsonwebtoken"
-
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "dev-access-token"
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "dev-refresh-token"
+import { ACCESS_TOKEN_SECRET } from "../../env.js"
 
 const registerValidationDef: IValidationDef = {
     email: {

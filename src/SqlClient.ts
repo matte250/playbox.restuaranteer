@@ -1,9 +1,5 @@
 import { createConnection, createPool } from "mysql2/promise";
-
-const DB_HOST = process.env.DB_HOST || "localhost";
-const DB_USER = process.env.DB_USER || "root";
-const DB_PASSWORD = process.env.DB_PASSWORD || "secret";
-const DB_NAME = process.env.DB_NAME || "restu_db";
+import { DB_HOST, DB_NAME, DB_PASSWORD, DB_USER } from "./env.js";
 
 interface QueryResponse {
     result?: any;
