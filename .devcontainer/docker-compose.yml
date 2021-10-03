@@ -3,8 +3,8 @@ services:
   db:
     image: mysql:8.0.26
     volumes:
-      - "./sql/:/docker-entrypoint-initdb.d"
-      - "./sql/:/sql"
+      - "../sql/:/docker-entrypoint-initdb.d"
+      - "../sql/:/sql"
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: secret
@@ -15,11 +15,15 @@ services:
       - 3306
   web:
     build: 
-      context: ./
-      dockerfile: ./Dockerfile
+      context: ../
+      dockerfile: ./.devcontainer/Dockerfile
     environment:
       DB_HOST: "db"
+    volumes:
+      - "../:/usr/src/app"
     depends_on:
       - "db"
     ports:
       - "3000:3000"
+      - "9229:9229"
+      - "35729:35729"
