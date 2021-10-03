@@ -5,7 +5,8 @@
   "exports": "./dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build:prod": "tsc -p",
+    "build:dev": "tsc",
     "start:dev": "npm ci && nodemon -L --config nodemon.json src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
