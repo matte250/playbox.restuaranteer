@@ -15,13 +15,45 @@ import cookieParser from "cookie-parser";
 import { IRequest } from "./types";
 import { createPlacesController } from "./services/places/controller.js";
 import { createReviewsRepository } from "./services/reviews/respository.js";
-import { createReviewsController } from "./services/reviews/controller.js"
+import { createReviewsController } from "./services/reviews/controller.js";
+import sequelizePkg from "sequelize";
 import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from "./env.js";
+
+const { DataTypes, Sequelize } = sequelizePkg;
 
 const app = express();
 
 var hbs = exphbs.create({
 });
+
+const sequelize = new Sequelize("restu_db_orm" , "root", DB_PASSWORD,  {
+    host: DB_HOST,
+    dialect: "mysql"
+})
+
+const FruitModel = sequelize.define("Fruits", {
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    origin: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    comment: DataTypes.STRING
+})
+
+try {
+    sequelize.authenticate()
+    console.log("YESBOX")
+} catch (error) {
+    console.log("NOBOX", error)
+}
+
+await sequelize.sync({ force: true })
+
+const fruit = await FruitModel.create({name: "Banana", origin: "Bananaland", comment: "Why in the actuall fuck is this not typed?"})
+
 
 // Use live reload
 if (ENV == "development") {
