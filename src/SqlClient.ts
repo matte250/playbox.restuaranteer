@@ -1,5 +1,5 @@
 import { createConnection, createPool } from "mysql2/promise";
-import { DB_HOST, DB_NAME, DB_PASSWORD, DB_USER } from "./env.js";
+import { DB_HOST, DB_NAME, DB_PASSWORD, DB_USER } from "./env";
 
 interface QueryResponse {
     result?: any;

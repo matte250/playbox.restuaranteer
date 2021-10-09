@@ -1,59 +1,27 @@
 
 import express, { NextFunction, Response } from "express";
 import exphbs from "express-handlebars";
-import { createSqlClient } from "./SqlClient.js";
+import { createSqlClient } from "./SqlClient";
 import connectLiveReload from "connect-livereload";
 import livereload from "livereload";
-import { createRouter } from "./createRouter.js";
-import { createAuthController } from "./services/auth/controller.js";
-import { createAuthRepository } from "./services/auth/respository.js";
-import { createPlacesRepository } from "./services/places/respository.js";
-import { createExperiencesController } from "./services/experiences/controller.js";
-import { createExperiencesRepository } from "./services/experiences/respository.js"
+import { createRouter } from "./createRouter";
+import { createAuthController } from "./services/auth/controller";
+import { createAuthRepository } from "./services/auth/respository";
+import { createPlacesRepository } from "./services/places/respository";
+import { createExperiencesController } from "./services/experiences/controller";
+import { createExperiencesRepository } from "./services/experiences/respository"
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { IRequest } from "./types";
-import { createPlacesController } from "./services/places/controller.js";
-import { createReviewsRepository } from "./services/reviews/respository.js";
-import { createReviewsController } from "./services/reviews/controller.js";
-import sequelizePkg from "sequelize";
-import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from "./env.js";
-
-const { DataTypes, Sequelize } = sequelizePkg;
+import { createPlacesController } from "./services/places/controller";
+import { createReviewsRepository } from "./services/reviews/respository";
+import { createReviewsController } from "./services/reviews/controller";
+import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from "./env";
 
 const app = express();
 
 var hbs = exphbs.create({
 });
-
-const sequelize = new Sequelize("restu_db_orm" , "root", DB_PASSWORD,  {
-    host: DB_HOST,
-    dialect: "mysql"
-})
-
-const FruitModel = sequelize.define("Fruits", {
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    origin: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    comment: DataTypes.STRING
-})
-
-try {
-    sequelize.authenticate()
-    console.log("YESBOX")
-} catch (error) {
-    console.log("NOBOX", error)
-}
-
-await sequelize.sync({ force: true })
-
-const fruit = await FruitModel.create({name: "Banana", origin: "Bananaland", comment: "Why in the actuall fuck is this not typed?"})
-
 
 // Use live reload
 if (ENV == "development") {
