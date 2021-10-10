@@ -15,10 +15,10 @@ model User {
   email       String   @unique
   password    String
   name        String
-  addedPlaces Places[]
+  addedPlaces Place[]
 }
 
-model Places {
+model Place {
   id             Int     @id @default(autoincrement())
   name           String
   createdBy      User    @relation(fields: [createdById], references: [id])
