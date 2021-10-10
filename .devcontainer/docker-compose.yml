@@ -35,6 +35,7 @@ services:
       context: ../
       dockerfile: ./.devcontainer/Dockerfile
     environment:
+      DATABASE_URL: postgresql://postgres:secret@postgres:5432/resturanteer?schema=public
       DB_HOST: "db"
     volumes:
       - "../:/usr/src/app"

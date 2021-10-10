@@ -17,6 +17,9 @@ import { createPlacesController } from "./services/places/controller";
 import { createReviewsRepository } from "./services/reviews/respository";
 import { createReviewsController } from "./services/reviews/controller";
 import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from "./env";
+import { PrismaClient } from ".prisma/client";
+import { createAuthService } from "./services/auth/service";
+import { v4 as guid } from "uuid";
 
 const app = express();
 
@@ -35,6 +38,13 @@ if (ENV == "development") {
 }
 
 // Connect to DB
+const prisma = new PrismaClient();
+
+await prisma.user.create({data: {
+    email: `user@prisma-${guid()}.dev`,
+    name: "prisma user",
+    password: "secret"
+}})
 const sqlClient = await createSqlClient();
 
 // Set template engine
@@ -53,11 +63,11 @@ const authenticate = (req: IRequest, res: Response, next: NextFunction) => {
     if (token == null) return next();
 
     jwt.verify(token, ACCESS_TOKEN_SECRET, (err: any, user: typeof req.context.user) => {
-        if(user !== undefined){
+        if (user !== undefined) {
             res.locals.user = user;
             req.context.user = user;
         }
-        
+
     })
     return next();
 }
@@ -69,6 +79,8 @@ var authRepo = createAuthRepository(sqlClient)
 var placesRepo = createPlacesRepository(sqlClient)
 var experiencesRepo = createExperiencesRepository(sqlClient)
 var reviewsRepo = createReviewsRepository(sqlClient)
+// Create services and inject dependencies
+var authService = createAuthService(authRepo, prisma)
 // Create controllers and inject dependencies
 var controllers = [
     ...createAuthController(authRepo),
@@ -82,14 +94,13 @@ app.use("/", router)
 
 // define a route handler for the default home page
 app.get("/home", async (_, res) => {
-    const { type, obj } = await authRepo.fetchAllUsers() 
-    if (obj !== undefined) {
-        res.render('home', {
-            restuarants: JSON.stringify(
-                (obj as any)
-            ),
-        });
-    }
+    const users = await authService.fetchAllUsers();
+    res.render('home', {
+        restuarants: JSON.stringify(
+            users
+        ),
+    });
+
 });
 
 // start the Express server
