@@ -11,8 +11,17 @@ generator client {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
-  name     String
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  password    String
+  name        String
+  addedPlaces Places[]
+}
+
+model Places {
+  id             Int     @id @default(autoincrement())
+  name           String
+  createdBy      User    @relation(fields: [createdById], references: [id])
+  createdById    Int
+  googleMapsLink String?
 }
