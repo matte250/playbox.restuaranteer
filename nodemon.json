@@ -1,9 +1,9 @@
 {
     "restartable": "rs",
     "ignore": [".git", "node_modules/", "dist/", "coverage/"],
-    "watch": ["src/"],
+    "watch": ["src/", "prisma/"],
     "execMap": {
-      "ts": "node --es-module-specifier-resolution=node --inspect --loader ts-node/esm ./src/index.ts"
+      "ts": "node --es-module-specifier-resolution=node --inspect --loader ts-node/esm ./src/index.ts & prisma generate --watch"
     },
     "env": {
       "NODE_ENV": "development"
