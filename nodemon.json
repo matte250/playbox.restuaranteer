@@ -3,7 +3,7 @@
     "ignore": [".git", "node_modules/", "dist/", "coverage/"],
     "watch": ["src/", "prisma/"],
     "execMap": {
-      "ts": "node --es-module-specifier-resolution=node --inspect --loader ts-node/esm ./src/index.ts & prisma generate --watch"
+      "ts": "node --es-module-specifier-resolution=node --inspect --loader ts-node/esm ./src/index.ts"
     },
     "env": {
       "NODE_ENV": "development"
