@@ -40,11 +40,6 @@ if (ENV == "development") {
 // Connect to DB
 const prisma = new PrismaClient();
 
-await prisma.user.create({data: {
-    email: `user@prisma-${guid()}.dev`,
-    name: "prisma user",
-    password: "secret"
-}})
 const sqlClient = await createSqlClient();
 
 // Set template engine
@@ -75,12 +70,12 @@ const authenticate = (req: IRequest, res: Response, next: NextFunction) => {
 app.use(authenticate)
 
 // Create repositories and inject dependencies
-var authRepo = createAuthRepository(sqlClient)
+var authRepo = createAuthRepository(prisma)
 var placesRepo = createPlacesRepository(sqlClient)
 var experiencesRepo = createExperiencesRepository(sqlClient)
 var reviewsRepo = createReviewsRepository(sqlClient)
 // Create services and inject dependencies
-var authService = createAuthService(authRepo, prisma)
+var authService = createAuthService(authRepo)
 // Create controllers and inject dependencies
 var controllers = [
     ...createAuthController(authRepo),
@@ -94,7 +89,7 @@ app.use("/", router)
 
 // define a route handler for the default home page
 app.get("/home", async (_, res) => {
-    const users = await authService.fetchAllUsers();
+    const users = await authService.getUsers();
     res.render('home', {
         restuarants: JSON.stringify(
             users

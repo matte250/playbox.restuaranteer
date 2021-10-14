@@ -1,9 +1,7 @@
 import { Controllers } from "../../createRouter.js"
 import { validate, IValidationDef } from "../../validation/validator.js"
 import { validators } from "../../validation/validators.js"
-import { IAuthRepo } from "./respository.js"
-import jwt from "jsonwebtoken"
-import { ACCESS_TOKEN_SECRET } from "../../env.js"
+import { IAuthService } from "./service.js"
 
 const registerValidationDef: IValidationDef = {
     email: {
@@ -35,9 +33,7 @@ const loginValidationDef: IValidationDef = {
     },
 }
 
-
-
-export const createAuthController = (repo: IAuthRepo): Controllers => (
+export const createAuthController = (service: IAuthService): Controllers => (
     [
         {
             path: "/register",
@@ -52,8 +48,8 @@ export const createAuthController = (repo: IAuthRepo): Controllers => (
                         name
                     })
 
-                var { type } = await repo.createUser(email, password, name)
-                if (type == "userexists")
+                var msg = await service.createUser(email, password, name)
+                if (msg == "email-already-in-use")
                     return res.render("register", {
                         errors: ["There is already an user with that email"],
                         name,
@@ -74,22 +70,16 @@ export const createAuthController = (repo: IAuthRepo): Controllers => (
                         email,
                     })
 
-                var repoRes = await repo.getUserWithCredentials(email, password)
-                if (repoRes.type === "usernotauthorized")
+                const result = await service.signIn(email, password);
+                if (result.msg === "sign-in-failed")
                     return res.render("login", {
-                        errors: ["Wrong email or password"],
+                        errors: ["Login failed"],
+                        email
                     })
-
-                const jwtObj = {
-                    ...repoRes.obj
-                }
-                res.locals.user = repoRes.obj;
-                req.context.user = repoRes.obj;
-                const accessToken = jwt.sign(jwtObj, ACCESS_TOKEN_SECRET)
-                res.setHeader("Authorization", "Bearer " + accessToken)
-                res.cookie("jwt", accessToken)
+                res.setHeader("Authorization", "Bearer " + result.cookie)
+                res.cookie("jwt", result.cookie)
                 res.render("home", {
-                    msg: `Welcome ${repoRes.obj.name}!`
+                    msg: `Welcome!`
                 })
 
             },
