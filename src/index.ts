@@ -78,7 +78,7 @@ var reviewsRepo = createReviewsRepository(sqlClient)
 var authService = createAuthService(authRepo)
 // Create controllers and inject dependencies
 var controllers = [
-    ...createAuthController(authRepo),
+    ...createAuthController(authService),
     ...createPlacesController(placesRepo),
     ...createExperiencesController(experiencesRepo, placesRepo),
     ...createReviewsController(reviewsRepo, placesRepo, experiencesRepo)
