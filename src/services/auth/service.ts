@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import { emailRegex } from '../../validation/regex';
 import { ACCESS_TOKEN_SECRET } from '../../env';
+import { Consumer } from "../../requestProvider";
 export interface IAuthService {
     getUsers: () => Promise<User[]>
     createUser: (name: string, email: UserEmail, password: string) => Promise<"user-created" | "email-already-in-use">
@@ -25,7 +26,7 @@ export interface UserSession {
     email: UserEmail;
 }
 
-export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
+export const createAuthService: Consumer = ({authRepo}): IAuthService => ({
     getUsers: async () => await authRepo.getUsers(),
     createUser: async (name, email, password) => {
         const salt = await bcrypt.genSalt(10);

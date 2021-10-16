@@ -19,12 +19,16 @@ import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from "./env";
 import { PrismaClient } from ".prisma/client";
 import { createAuthService } from "./services/auth/service";
 import { v4 as guid } from "uuid";
+import { createRequestProvider } from "./requestProvider";
 
 const app = express();
 
 var hbs = exphbs.create({
 });
 
+createRequestProvider();
+
+/*
 // Use live reload
 if (ENV == "development") {
     app.use(connectLiveReload())
@@ -101,3 +105,4 @@ app.get("/home", async (_, res) => {
 app.listen(Number(PORT), "0.0.0.0", () => {
     console.log(`server started at http://localhost:${PORT}`);
 });
+*/
