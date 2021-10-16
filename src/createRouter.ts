@@ -15,13 +15,15 @@ export type Controller = {
 type HttpMethod = "get" | "post" | "put" | "delete";
 const httpMethodsToMatch: HttpMethod[] = ["get", "post", "put", "delete"];
 
-const matchControllerToHttpMethod = (router: Router, path: string, conntrollerFunction: ControllerFunction, method: HttpMethod) => {
-    if (conntrollerFunction !== undefined) 
-        router[method](path, conntrollerFunction)
-}
-
 export const createRouter = (controllers: Controllers) => {
     var router = express.Router()
-    controllers.forEach(x => httpMethodsToMatch.forEach(httpMethod => matchControllerToHttpMethod(router, x.path, x[httpMethod], httpMethod)))
+    controllers.forEach(x => 
+        httpMethodsToMatch.forEach(httpMethod => {
+            const controllerFunction = x[httpMethod];
+            if(!controllerFunction)
+                return;
+            router[httpMethod](x.path, controllerFunction)
+        })
+    )
     return router;
 }

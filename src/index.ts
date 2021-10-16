@@ -1,4 +1,3 @@
-
 import express, { NextFunction, Response } from "express";
 import exphbs from "express-handlebars";
 import { createSqlClient } from "./SqlClient";

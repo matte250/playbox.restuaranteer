@@ -1,9 +1,8 @@
-import { emailRegex } from "validation/regex";
 import { IAuthRepo, User } from "./respository";
 import bcrypt from "bcrypt";
-import { ACCESS_TOKEN_SECRET } from "env";
 import jwt from "jsonwebtoken"
-
+import { emailRegex } from '../../validation/regex';
+import { ACCESS_TOKEN_SECRET } from '../../env';
 export interface IAuthService {
     getUsers: () => Promise<User[]>
     createUser: (name: string, email: UserEmail, password: string) => Promise<"user-created" | "email-already-in-use">
