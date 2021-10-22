@@ -7,11 +7,11 @@ import { ACCESS_TOKEN_SECRET } from '../../env';
 export interface IAuthService {
     getUsers: () => Promise<User[]>
     createUser: (name: string, email: UserEmail, password: string) => Promise<"user-created" | "email-already-in-use">
-    signIn: (email: string, password: string) => Promise<{msg: "sign-in-success", cookie: string} | { msg: "sign-in-failed"}>
+    signIn: (email: UserEmail, password: string) => Promise<{msg: "sign-in-success", cookie: string} | { msg: "sign-in-failed"}>
     extractToken: (token: string) => {msg: "success", userSession: UserSession} | {msg: "failed"}
 }
 
-class UserEmail {
+export class UserEmail {
     readonly value: string
     constructor(email: string){
         if(emailRegex.test(email))
@@ -37,7 +37,7 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
         return msg;
     },
     signIn: async (email, password) => {
-        const res = await authRepo.getUserByEmail(email);
+        const res = await authRepo.getUserByEmail(email.value);
         if(res.msg === "user-not-found")
             return { msg: "sign-in-failed" }
         
