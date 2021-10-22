@@ -1,4 +1,4 @@
-import { Controllers } from "../../createRouter.js"
+import { Controller } from "../../createRouter.js"
 import { validate, IValidationDef } from "../../validation/validator.js"
 import { validators } from "../../validation/validators.js"
 import { IAuthService } from "./service.js"
@@ -33,69 +33,55 @@ const loginValidationDef: IValidationDef = {
     },
 }
 
-export const createAuthController = (service: IAuthService): Controllers => (
-    [
+export const createAuthController = (service: IAuthService): Controller => ({
+    domain: "auth",
+    version: 1,
+    routes: [
         {
-            path: "/register",
-            get: (_, res) => res.render("register"),
-            post: async (req, res) => {
+            httpMethod: "post",
+            path: "register",
+            func: async (req, res) => {
                 const errors = validate(req.body, registerValidationDef).onlyMsg()
                 const { email = "", name = "", password = "" } = { ...req.body };
                 if (errors.length > 0)
-                    return res.render("register", {
-                        errors,
-                        email,
-                        name
-                    })
+                    return res.status(400);
 
                 var msg = await service.createUser(email, password, name)
                 if (msg == "email-already-in-use")
-                    return res.render("register", {
-                        errors: ["There is already an user with that email"],
-                        name,
-                    })
+                    return res.status(409)
 
-                res.redirect("home")
-            },
+                return res.status(200)
+            }
         },
         {
-            path: "/login",
-            get: (_, res) => res.render("login"),
-            post: async (req, res) => {
+            httpMethod: "post",
+            path: "login",
+            func: async (req, res) => {
                 const errors = validate(req.body, loginValidationDef).onlyMsg()
                 const { email = "", password = "" } = req.body;
                 if (errors.length > 0)
-                    return res.render("login", {
-                        errors,
-                        email,
-                    })
+                    return res.status(400);
 
                 const result = await service.signIn(email, password);
                 if (result.msg === "sign-in-failed")
-                    return res.render("login", {
-                        errors: ["Login failed"],
-                        email
-                    })
+                    return res.status(409);
+
                 res.setHeader("Authorization", "Bearer " + result.cookie)
                 res.cookie("jwt", result.cookie)
-                res.render("home", {
-                    msg: `Welcome!`
-                })
-
-            },
+                return res.json(result.cookie)
+            }
         },
         {
-            path: "/logout",
-            post: async (req, res) => {
+            httpMethod: "post",
+            path: "logout",
+            func: async (req, res) => {
                 if (req.context.user === undefined)
-                    return res.render("login", {
-                        errors: ["Not authorized"]
-                    })
-                res.clearCookie("jwt");
+                    return res.status(401)
+                res.clearCookie("jwt")
                 res.locals.user = undefined
                 req.context.user = undefined 
-                return res.render("login", { msg: "Logged out succesfully" })
+                return res.status(200)
             },
         }
     ]
-)
+})

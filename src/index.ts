@@ -1,34 +1,22 @@
 import express, { NextFunction, Response } from "express";
 import exphbs from "express-handlebars";
-import { createSqlClient } from "./SqlClient";
 import connectLiveReload from "connect-livereload";
 import livereload from "livereload";
 import { createRouter } from "./createRouter";
 import { createAuthController } from "./services/auth/controller";
 import { createAuthRepository } from "./services/auth/respository";
-import { createPlacesRepository } from "./services/places/respository";
-import { createExperiencesController } from "./services/experiences/controller";
-import { createExperiencesRepository } from "./services/experiences/respository"
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { IRequest } from "./types";
-import { createPlacesController } from "./services/places/controller";
-import { createReviewsRepository } from "./services/reviews/respository";
-import { createReviewsController } from "./services/reviews/controller";
 import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from "./env";
 import { PrismaClient } from ".prisma/client";
 import { createAuthService } from "./services/auth/service";
-import { v4 as guid } from "uuid";
-import { createRequestProvider } from "./requestProvider";
 
 const app = express();
 
 var hbs = exphbs.create({
 });
 
-createRequestProvider();
-
-/*
 // Use live reload
 if (ENV == "development") {
     app.use(connectLiveReload())
@@ -42,8 +30,6 @@ if (ENV == "development") {
 
 // Connect to DB
 const prisma = new PrismaClient();
-
-const sqlClient = await createSqlClient();
 
 // Set template engine
 app.engine("handlebars", hbs.engine);
@@ -74,17 +60,11 @@ app.use(authenticate)
 
 // Create repositories and inject dependencies
 var authRepo = createAuthRepository(prisma)
-var placesRepo = createPlacesRepository(sqlClient)
-var experiencesRepo = createExperiencesRepository(sqlClient)
-var reviewsRepo = createReviewsRepository(sqlClient)
 // Create services and inject dependencies
 var authService = createAuthService(authRepo)
 // Create controllers and inject dependencies
 var controllers = [
-    ...createAuthController(authService),
-    ...createPlacesController(placesRepo),
-    ...createExperiencesController(experiencesRepo, placesRepo),
-    ...createReviewsController(reviewsRepo, placesRepo, experiencesRepo)
+    createAuthController(authService),
 ]
 // Register and map controllers to routes
 var router = createRouter(controllers);
@@ -105,4 +85,3 @@ app.get("/home", async (_, res) => {
 app.listen(Number(PORT), "0.0.0.0", () => {
     console.log(`server started at http://localhost:${PORT}`);
 });
-*/

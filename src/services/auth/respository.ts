@@ -1,5 +1,5 @@
-import { User as DbUser} from ".prisma/client";
-import { Consumer } from "../../requestProvider";
+import { PrismaClient, User as DbUser} from ".prisma/client";
+
 
 export interface User {
     id: number,
@@ -19,16 +19,16 @@ const mapDbUser = (dbUser: DbUser): User => {
     return { id, name, email, passwordHash }
 }
 
-export const createAuthRepository: Consumer = ({prismaClient}): IAuthRepo => ({
+export const createAuthRepository = (client: PrismaClient): IAuthRepo => ({
     getUserByEmail: async (email: string) => {
-        const user = await prismaClient.user.findUnique({ where: {email}})
+        const user = await client.user.findUnique({ where: {email}})
         if(!user)
             return {msg: "user-not-found"}
         return {msg: "user-found", user: mapDbUser(user)}
     },
-    getUsers: async () => (await prismaClient.user.findMany()).map(x => mapDbUser(x)),
+    getUsers: async () => (await client.user.findMany()).map(x => mapDbUser(x)),
     createUser: async (email, passwordHash, passwordSalt, name) => {
-        return await prismaClient.$transaction(async (tran) => {
+        return await client.$transaction(async (tran) => {
             const existingUser = await tran.user.findUnique({where: { email }})
             if(existingUser)
                 return { msg: "email-already-in-use" }

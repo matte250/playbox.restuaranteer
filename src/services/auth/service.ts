@@ -3,11 +3,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import { emailRegex } from '../../validation/regex';
 import { ACCESS_TOKEN_SECRET } from '../../env';
-import { Consumer } from "../../requestProvider";
+
 export interface IAuthService {
     getUsers: () => Promise<User[]>
     createUser: (name: string, email: UserEmail, password: string) => Promise<"user-created" | "email-already-in-use">
     signIn: (email: string, password: string) => Promise<{msg: "sign-in-success", cookie: string} | { msg: "sign-in-failed"}>
+    extractToken: (token: string) => {msg: "success", userSession: UserSession} | {msg: "failed"}
 }
 
 class UserEmail {
@@ -26,7 +27,7 @@ export interface UserSession {
     email: UserEmail;
 }
 
-export const createAuthService: Consumer = ({authRepo}): IAuthService => ({
+export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
     getUsers: async () => await authRepo.getUsers(),
     createUser: async (name, email, password) => {
         const salt = await bcrypt.genSalt(10);
@@ -55,5 +56,13 @@ export const createAuthService: Consumer = ({authRepo}): IAuthService => ({
             msg: "sign-in-success",
             cookie: jwt.sign(userSession, ACCESS_TOKEN_SECRET)
         }
+    },
+    extractToken: (token) => {
+        jwt.verify(token, ACCESS_TOKEN_SECRET, (err: any, userSession: UserSession) => {
+            if (userSession !== undefined) {
+                return {msg: "success", userSession};
+            }
+        })
+        return { msg: "failed" }
     }
 })
