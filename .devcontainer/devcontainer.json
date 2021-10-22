@@ -24,14 +24,15 @@
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"jakebathman.mysql-syntax"
+		"jakebathman.mysql-syntax",
+		"prisma.prisma"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
 	// Uncomment the next line if you want start specific services in your Docker Compose config.
-	"runServices": ["db"],
+	"runServices": ["db", "pgadmin", "postgres"],
 	"overrideCommand": false,
 
 	// Uncomment the next line if you want to keep your containers running after VS Code shuts down.
@@ -42,5 +43,5 @@
 	// "postCreateCommand": "bash -c 'npm run start:dev'"
 
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
-	// "remoteUser": "vscode"
+	// "remoteUser": "node"
 }

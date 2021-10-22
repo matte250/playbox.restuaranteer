@@ -1,9 +1,7 @@
-import { Controllers } from "../../createRouter.js"
+import { Controller } from "../../createRouter.js"
 import { validate, IValidationDef } from "../../validation/validator.js"
 import { validators } from "../../validation/validators.js"
-import { IAuthRepo } from "./respository.js"
-import jwt from "jsonwebtoken"
-import { ACCESS_TOKEN_SECRET } from "../../env.js"
+import { IAuthService } from "./service.js"
 
 const registerValidationDef: IValidationDef = {
     email: {
@@ -35,77 +33,55 @@ const loginValidationDef: IValidationDef = {
     },
 }
 
-
-
-export const createAuthController = (repo: IAuthRepo): Controllers => (
-    [
+export const createAuthController = (service: IAuthService): Controller => ({
+    domain: "auth",
+    version: 1,
+    routes: [
         {
-            path: "/register",
-            get: (_, res) => res.render("register"),
-            post: async (req, res) => {
+            httpMethod: "post",
+            path: "register",
+            func: async (req, res) => {
                 const errors = validate(req.body, registerValidationDef).onlyMsg()
                 const { email = "", name = "", password = "" } = { ...req.body };
                 if (errors.length > 0)
-                    return res.render("register", {
-                        errors,
-                        email,
-                        name
-                    })
+                    return res.status(400);
 
-                var { type } = await repo.createUser(email, password, name)
-                if (type == "userexists")
-                    return res.render("register", {
-                        errors: ["There is already an user with that email"],
-                        name,
-                    })
+                var msg = await service.createUser(email, password, name)
+                if (msg == "email-already-in-use")
+                    return res.status(409)
 
-                res.redirect("home")
-            },
+                return res.status(200)
+            }
         },
         {
-            path: "/login",
-            get: (_, res) => res.render("login"),
-            post: async (req, res) => {
+            httpMethod: "post",
+            path: "login",
+            func: async (req, res) => {
                 const errors = validate(req.body, loginValidationDef).onlyMsg()
                 const { email = "", password = "" } = req.body;
                 if (errors.length > 0)
-                    return res.render("login", {
-                        errors,
-                        email,
-                    })
+                    return res.status(400);
 
-                var repoRes = await repo.getUserWithCredentials(email, password)
-                if (repoRes.type === "usernotauthorized")
-                    return res.render("login", {
-                        errors: ["Wrong email or password"],
-                    })
+                const result = await service.signIn(email, password);
+                if (result.msg === "sign-in-failed")
+                    return res.status(409);
 
-                const jwtObj = {
-                    ...repoRes.obj
-                }
-                res.locals.user = repoRes.obj;
-                req.context.user = repoRes.obj;
-                const accessToken = jwt.sign(jwtObj, ACCESS_TOKEN_SECRET)
-                res.setHeader("Authorization", "Bearer " + accessToken)
-                res.cookie("jwt", accessToken)
-                res.render("home", {
-                    msg: `Welcome ${repoRes.obj.name}!`
-                })
-
-            },
+                res.setHeader("Authorization", "Bearer " + result.cookie)
+                res.cookie("jwt", result.cookie)
+                return res.json(result.cookie)
+            }
         },
         {
-            path: "/logout",
-            post: async (req, res) => {
+            httpMethod: "post",
+            path: "logout",
+            func: async (req, res) => {
                 if (req.context.user === undefined)
-                    return res.render("login", {
-                        errors: ["Not authorized"]
-                    })
-                res.clearCookie("jwt");
+                    return res.status(401)
+                res.clearCookie("jwt")
                 res.locals.user = undefined
                 req.context.user = undefined 
-                return res.render("login", { msg: "Logged out succesfully" })
+                return res.status(200)
             },
         }
     ]
-)
+})

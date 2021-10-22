@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+model User {
+  id               Int          @id @default(autoincrement())
+  email            String       @unique
+  passwordHash     String
+  passwordSalt     String
+  name             String
+  addedPlaces      Place[]
+  addedExperiences Experience[]
+  reviews          Review[]
+}
+
+model Place {
+  id             Int          @id @default(autoincrement())
+  name           String
+  createdBy      User         @relation(fields: [createdById], references: [id])
+  createdById    Int
+  googleMapsLink String?
+  experiences    Experience[]
+}
+
+model Experience {
+  id          Int      @id @default(autoincrement())
+  when        DateTime
+  at          Place    @relation(fields: [atId], references: [id])
+  atId        Int
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById Int
+  reviews     Review[]
+}
+
+model Review {
+  id           Int        @id @default(autoincrement())
+  score        Float
+  created      DateTime
+  createdBy    User       @relation(fields: [createdById], references: [id])
+  createdById  Int
+  experience   Experience @relation(fields: [experienceId], references: [id])
+  experienceId Int
+  mealName     String
+  note         String
+}

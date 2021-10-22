@@ -1,80 +1,39 @@
-import { v4 as guid } from "uuid";
-import { RepoFunctionResponse, RepoFunctionResponseWithResult, SqlClient } from "../../SqlClient";
+import { PrismaClient, User as DbUser} from ".prisma/client";
 
-interface DbUser {
-    id: string
-    email: string
-    name: string
+
+export interface User {
+    id: number,
+    name: string,
+    email: string,
+    passwordHash: string,
 }
 
 export interface IAuthRepo {
-    createUser: (email: string, password: string, name: string) => Promise<UserCreated | UserAlreadyExists>;
-    fetchAllUsers: () => Promise<UsersFetched>
-    getUserWithCredentials: (email: string, password: string) => Promise<UserFetched | UserNotAuthorized>
+    getUserByEmail: (email: string) => Promise<{ msg: "user-found", user: User} | { msg: "user-not-found"}>
+    getUsers: () => Promise<User[]>
+    createUser: (email: string, passwordHash: string, passwordSalt: string, name: string) => Promise<{ msg: "user-created", createdUser: User } | { msg: "email-already-in-use" }>;
 }
 
-type UserCreated = RepoFunctionResponse<"usercreated">
-type UserAlreadyExists = RepoFunctionResponse<"userexists">
-type UsersFetched = RepoFunctionResponseWithResult<"usersfetched", DbUser[]>
-type UserFetched = RepoFunctionResponseWithResult<"userfetched", DbUser>
-type UserNotAuthorized = RepoFunctionResponse<"usernotauthorized">
+const mapDbUser = (dbUser: DbUser): User => {
+    const { id, name, email, passwordHash } = dbUser
+    return { id, name, email, passwordHash }
+}
 
-export const createAuthRepository = (client: SqlClient): IAuthRepo => ({
-    createUser: (email: string, password: string, name: string) =>
-        client.useConnection(async connection => {
-            var { result } = await connection.query(
-                `
-                SELECT EXISTS(
-                    SELECT *
-                    FROM users
-                    WHERE email = :email)
-                `,
-                {
-                    email
-                }
-            )
-            if (result[0] === true)
-                return { type: "userexists" }
-            await connection.query(
-                `
-                    INSERT INTO users (id, email, password, name) VALUES(:id,:email,:password,:name)
-                `,
-                {
-                    id: guid(),
-                    email,
-                    password,
-                    name,
-                }
-            )
-            return { type: "usercreated" }
-        }),
-
-    fetchAllUsers: () =>
-        client.useConnection(async connection => {
-            var res = await connection.query(`SELECT id, email, name FROM users`)
-            return { type: "usersfetched", obj: res.result }
-        }),
-    getUserWithCredentials: async (email: string, password: string) =>
-        client.useConnection(async connection => {
-            var { result } = await connection.query(`
-            SELECT
-                id,
-                email,
-                name 
-            FROM 
-                users
-            WHERE 
-                email = :email
-                AND password = :password
-            LIMIT 1;
-            `, {
-                email,
-                password
-            });
-            var possibleUser = result[0]
-            if (possibleUser == undefined)
-                return { type: "usernotauthorized" }
-
-            return { type: "userfetched", obj: (possibleUser as DbUser) }
+export const createAuthRepository = (client: PrismaClient): IAuthRepo => ({
+    getUserByEmail: async (email: string) => {
+        const user = await client.user.findUnique({ where: {email}})
+        if(!user)
+            return {msg: "user-not-found"}
+        return {msg: "user-found", user: mapDbUser(user)}
+    },
+    getUsers: async () => (await client.user.findMany()).map(x => mapDbUser(x)),
+    createUser: async (email, passwordHash, passwordSalt, name) => {
+        return await client.$transaction(async (tran) => {
+            const existingUser = await tran.user.findUnique({where: { email }})
+            if(existingUser)
+                return { msg: "email-already-in-use" }
+            const createdUser = await tran.user.create({data: { email, passwordHash, passwordSalt, name}})
+            return { msg: "user-created", createdUser: mapDbUser(createdUser) }
         })
+    }
 })

@@ -1,22 +1,16 @@
-
 import express, { NextFunction, Response } from "express";
 import exphbs from "express-handlebars";
-import { createSqlClient } from "./SqlClient.js";
 import connectLiveReload from "connect-livereload";
 import livereload from "livereload";
-import { createRouter } from "./createRouter.js";
-import { createAuthController } from "./services/auth/controller.js";
-import { createAuthRepository } from "./services/auth/respository.js";
-import { createPlacesRepository } from "./services/places/respository.js";
-import { createExperiencesController } from "./services/experiences/controller.js";
-import { createExperiencesRepository } from "./services/experiences/respository.js"
+import { createRouter } from "./createRouter";
+import { createAuthController } from "./services/auth/controller";
+import { createAuthRepository } from "./services/auth/respository";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import { IRequest } from "./types";
-import { createPlacesController } from "./services/places/controller.js";
-import { createReviewsRepository } from "./services/reviews/respository.js";
-import { createReviewsController } from "./services/reviews/controller.js"
-import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from "./env.js";
+import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from "./env";
+import { PrismaClient } from ".prisma/client";
+import { createAuthService } from "./services/auth/service";
 
 const app = express();
 
@@ -35,7 +29,7 @@ if (ENV == "development") {
 }
 
 // Connect to DB
-const sqlClient = await createSqlClient();
+const prisma = new PrismaClient();
 
 // Set template engine
 app.engine("handlebars", hbs.engine);
@@ -53,11 +47,11 @@ const authenticate = (req: IRequest, res: Response, next: NextFunction) => {
     if (token == null) return next();
 
     jwt.verify(token, ACCESS_TOKEN_SECRET, (err: any, user: typeof req.context.user) => {
-        if(user !== undefined){
+        if (user !== undefined) {
             res.locals.user = user;
             req.context.user = user;
         }
-        
+
     })
     return next();
 }
@@ -65,16 +59,12 @@ const authenticate = (req: IRequest, res: Response, next: NextFunction) => {
 app.use(authenticate)
 
 // Create repositories and inject dependencies
-var authRepo = createAuthRepository(sqlClient)
-var placesRepo = createPlacesRepository(sqlClient)
-var experiencesRepo = createExperiencesRepository(sqlClient)
-var reviewsRepo = createReviewsRepository(sqlClient)
+var authRepo = createAuthRepository(prisma)
+// Create services and inject dependencies
+var authService = createAuthService(authRepo)
 // Create controllers and inject dependencies
 var controllers = [
-    ...createAuthController(authRepo),
-    ...createPlacesController(placesRepo),
-    ...createExperiencesController(experiencesRepo, placesRepo),
-    ...createReviewsController(reviewsRepo, placesRepo, experiencesRepo)
+    createAuthController(authService),
 ]
 // Register and map controllers to routes
 var router = createRouter(controllers);
@@ -82,14 +72,13 @@ app.use("/", router)
 
 // define a route handler for the default home page
 app.get("/home", async (_, res) => {
-    const { type, obj } = await authRepo.fetchAllUsers() 
-    if (obj !== undefined) {
-        res.render('home', {
-            restuarants: JSON.stringify(
-                (obj as any)
-            ),
-        });
-    }
+    const users = await authService.getUsers();
+    res.render('home', {
+        restuarants: JSON.stringify(
+            users
+        ),
+    });
+
 });
 
 // start the Express server

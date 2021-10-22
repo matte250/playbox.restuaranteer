@@ -1,27 +1,31 @@
 
-import express, { Router, IRouterMatcher, Request, Response } from "express"
+import express, { Response } from "express"
 import { IRequest } from "./types";
 type ControllerFunction = (req: IRequest, res: Response) => void;
 
-export type Controllers = Controller[];
+type Controllers = Controller[]
+
 export type Controller = {
-    path: string,
-    get?: ControllerFunction,
-    post?: ControllerFunction,
-    put?: ControllerFunction,
-    delete?: ControllerFunction,
-};
-
-type HttpMethod = "get" | "post" | "put" | "delete";
-const httpMethodsToMatch: HttpMethod[] = ["get", "post", "put", "delete"];
-
-const matchControllerToHttpMethod = (router: Router, path: string, conntrollerFunction: ControllerFunction, method: HttpMethod) => {
-    if (conntrollerFunction !== undefined) 
-        router[method](path, conntrollerFunction)
+    domain: string,
+    version: number,
+    routes: Array<{
+        path: string,
+        httpMethod: HttpMethod,
+        func: ControllerFunction
+    }>
 }
+
+export type HttpMethod = "get" | "post" | "put" | "delete";
 
 export const createRouter = (controllers: Controllers) => {
     var router = express.Router()
-    controllers.forEach(x => httpMethodsToMatch.forEach(httpMethod => matchControllerToHttpMethod(router, x.path, x[httpMethod], httpMethod)))
+    controllers.forEach(controller => {
+        controller.routes.forEach(route => {
+            router[route.httpMethod](
+                `/${controller.domain}/v${controller.version}/${route.path}`,
+                route.func
+            )
+        })
+    })
     return router;
 }
