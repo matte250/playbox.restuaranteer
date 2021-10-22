@@ -17,19 +17,6 @@ services:
       POSTGRES_DB: resturanteer
     ports:
       - 5432:5432
-  db:
-    image: mysql:8.0.26
-    volumes:
-      - "../sql/:/docker-entrypoint-initdb.d"
-      - "../sql/:/sql"
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: restu_db
-    ports: 
-      - 3306:3306
-    expose:
-      - 3306
   web:
     build: 
       context: ../
