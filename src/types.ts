@@ -1,11 +1,11 @@
-import { Request } from "express"
+import { Request } from 'express';
 
 export interface IRequest extends Request {
-    context: {
-        user?: {
-            email: string,
-            id: string,
-            name: string,
-        }
-    }
+	context: {
+		user?: {
+			email: string;
+			id: string;
+			name: string;
+		};
+	};
 }
