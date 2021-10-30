@@ -4,6 +4,8 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "target": "es2017",
+        "strict": true,
+        "alwaysStrict": true,
         "noImplicitAny": true,
         "moduleResolution": "node",
         "strictNullChecks": true,

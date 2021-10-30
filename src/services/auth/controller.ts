@@ -1,86 +1,65 @@
-import { Controller } from '../../createRouter.js';
-import { validate, IValidationDef } from '../../validation/validator.js';
-import { validators } from '../../validation/validators.js';
-import { IAuthService, UserEmail } from './service.js';
+import { Conflict, Controller, Ok, Route } from '../../createRouter.js';
+import { Email, stringTypeGuard } from '../../typeguard.js';
+import { IAuthService } from './service.js';
 
-const registerValidationDef: IValidationDef = {
-	email: {
-		$req: true,
-		$lbl: 'Email',
-		$: validators.isEmail,
-	},
-	name: {
-		$req: true,
-		$lbl: 'Name',
-	},
-	password: {
-		$req: true,
-		$lbl: 'Password',
-		$: validators.isPassword,
-	},
-};
+interface IRegisterPostRequest {
+	email: Email;
+	name: string;
+	password: string;
+}
 
-const loginValidationDef: IValidationDef = {
-	email: {
-		$req: true,
-		$lbl: 'Email',
-		$: validators.isEmail,
-	},
-	password: {
-		$req: true,
-		$lbl: 'Password',
-		$: validators.isPassword,
-	},
-};
+interface ILoginPostRequest {
+	email: Email;
+	password: string;
+}
 
-export const createAuthController = (service: IAuthService): Controller => ({
-	domain: 'auth',
-	version: 1,
-	routes: [
-		{
-			httpMethod: 'post',
-			path: 'register',
-			func: async (req, res) => {
-				const errors = validate(
-					req.body,
-					registerValidationDef,
-				).onlyMsg();
-				const {
-					email = '',
-					name = '',
-					password = '',
-				} = { ...req.body };
-				if (errors.length > 0) return res.status(400).json(errors);
+export const createAuthController = (
+	authService: IAuthService,
+): Controller<{
+	registerPostRequest: IRegisterPostRequest;
+	loginPostRequest: ILoginPostRequest;
+}> => {
+	const registerPostRequest: Route<IRegisterPostRequest> = {
+		httpMethod: 'post',
+		path: 'register',
+		requestMap: ({ body }) => ({
+			email: new Email(body.email),
+			name: stringTypeGuard(body.name),
+			password: stringTypeGuard(body.password),
+		}),
+		response: async (req) => {
+			const { email, name, password } = req;
 
-				const msg = await service.createUser(
-					name,
-					new UserEmail(email),
-					password,
-				);
-				if (msg == 'email-already-in-use') return res.sendStatus(409);
+			const msg = await authService.createUser(name, email, password);
+			if (msg == 'email-already-in-use') return new Conflict();
 
-				return res.sendStatus(200);
-			},
+			return new Ok();
 		},
-		{
-			httpMethod: 'post',
-			path: 'login',
-			func: async (req, res) => {
-				const errors = validate(req.body, loginValidationDef).onlyMsg();
-				const { email = '', password = '' } = req.body;
-				if (errors.length > 0) return res.status(400).json(errors);
+	};
 
-				const result = await service.signIn(
-					new UserEmail(email),
-					password,
-				);
-				if (result.msg === 'sign-in-failed') return res.sendStatus(409);
+	const loginPostRequest: Route<ILoginPostRequest> = {
+		httpMethod: 'post',
+		path: 'login',
+		requestMap: ({ body }) => ({
+			email: new Email(body.email),
+			password: stringTypeGuard(body.password),
+		}),
+		response: async (req) => {
+			const { email, password } = req;
 
-				res.setHeader('Authorization', 'Bearer ' + result.cookie);
-				res.cookie('jwt', result.cookie);
+			const result = await authService.signIn(email, password);
+			if (result.msg === 'sign-in-failed') return new Conflict();
 
-				return res.json(result.cookie);
-			},
+			return new Ok(result.cookie);
 		},
-	],
-});
+	};
+
+	return {
+		domain: 'auth',
+		version: 1,
+		routes: {
+			registerPostRequest,
+			loginPostRequest,
+		},
+	};
+};

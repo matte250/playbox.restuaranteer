@@ -39,27 +39,16 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded());
 
-// Setup Authentication
+// Setup Authentication(This does nothing atm)
 const authenticate = (req: IRequest, res: Response, next: NextFunction) => {
 	req.context = {};
 	const token = req?.cookies?.['jwt'] ?? null;
 	if (token == null) return next();
 
-	jwt.verify(
-		token,
-		ACCESS_TOKEN_SECRET,
-		(err: any, user: typeof req.context.user) => {
-			if (user !== undefined) {
-				res.locals.user = user;
-				req.context.user = user;
-			}
-		},
-	);
-
 	return next();
 };
 
-app.use(authenticate);
+app.use(authenticate as any);
 
 // Create repositories and inject dependencies
 const authRepo = createAuthRepository(prisma);

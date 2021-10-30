@@ -3,16 +3,17 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { emailRegex } from '../../validation/regex';
 import { ACCESS_TOKEN_SECRET } from '../../env';
+import { Email } from '../../typeguard';
 
 export interface IAuthService {
 	getUsers: () => Promise<User[]>;
 	createUser: (
 		name: string,
-		email: UserEmail,
+		email: Email,
 		password: string,
 	) => Promise<'user-created' | 'email-already-in-use'>;
 	signIn: (
-		email: UserEmail,
+		email: Email,
 		password: string,
 	) => Promise<
 		{ msg: 'sign-in-success'; cookie: string } | { msg: 'sign-in-failed' }
@@ -22,18 +23,10 @@ export interface IAuthService {
 	) => { msg: 'success'; userSession: UserSession } | { msg: 'failed' };
 }
 
-export class UserEmail {
-	readonly value: string;
-	constructor(email: string) {
-		if (emailRegex.test(email)) this.value = email;
-		else throw Error('Invalid email');
-	}
-}
-
 export interface UserSession {
 	id: number;
 	name: string;
-	email: UserEmail;
+	email: Email;
 }
 
 export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
@@ -61,7 +54,7 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 		const userSession: UserSession = {
 			id: res.user.id,
 			name: res.user.name,
-			email: new UserEmail(res.user.email),
+			email: new Email(res.user.email),
 		};
 
 		return {
@@ -73,7 +66,7 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 		jwt.verify(
 			token,
 			ACCESS_TOKEN_SECRET,
-			(err: any, userSession: UserSession) => {
+			(err: any, userSession: unknown) => {
 				if (userSession !== undefined) {
 					return { msg: 'success', userSession };
 				}
