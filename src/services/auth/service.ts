@@ -1,4 +1,4 @@
-import { IAuthRepo, User } from './respository';
+import { IAuthRepo, User } from './repository';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from '../../env';

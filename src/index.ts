@@ -4,7 +4,7 @@ import connectLiveReload from 'connect-livereload';
 import livereload from 'livereload';
 import { createRouter } from './createRouter';
 import { createAuthController } from './services/auth/controller';
-import { createAuthRepository } from './services/auth/respository';
+import { createAuthRepository } from './services/auth/repository';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import { IRequest } from './types';

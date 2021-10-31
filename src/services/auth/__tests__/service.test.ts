@@ -1,5 +1,5 @@
 import { Email } from '../../../typeguard';
-import { IAuthRepo, User } from '../respository';
+import { IAuthRepo, User } from '../repository';
 import { createAuthService, UserSession } from '../service';
 import { mocked } from 'ts-jest/utils';
 import bcrypt from 'bcrypt';
