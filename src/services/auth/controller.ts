@@ -18,48 +18,42 @@ export const createAuthController = (
 ): Controller<{
 	registerPostRequest: IRegisterPostRequest;
 	loginPostRequest: ILoginPostRequest;
-}> => {
-	const registerPostRequest: Route<IRegisterPostRequest> = {
-		httpMethod: 'post',
-		path: 'register',
-		requestMap: ({ body }) => ({
-			email: new Email(body.email),
-			name: stringTypeGuard(body.name),
-			password: stringTypeGuard(body.password),
-		}),
-		response: async (req) => {
-			const { email, name, password } = req;
+}> => ({
+	domain: 'auth',
+	version: 1,
+	routes: {
+		registerPostRequest: {
+			httpMethod: 'post',
+			path: 'register',
+			requestMap: ({ body }) => ({
+				email: new Email(body.email),
+				name: stringTypeGuard(body.name),
+				password: stringTypeGuard(body.password),
+			}),
+			response: async (req) => {
+				const { email, name, password } = req;
 
-			const msg = await authService.createUser(name, email, password);
-			if (msg == 'email-already-in-use') return new Conflict();
+				const msg = await authService.createUser(name, email, password);
+				if (msg == 'email-already-in-use') return new Conflict();
 
-			return new Ok();
+				return new Ok();
+			},
 		},
-	};
+		loginPostRequest: {
+			httpMethod: 'post',
+			path: 'login',
+			requestMap: ({ body }) => ({
+				email: new Email(body.email),
+				password: stringTypeGuard(body.password),
+			}),
+			response: async (req) => {
+				const { email, password } = req;
 
-	const loginPostRequest: Route<ILoginPostRequest> = {
-		httpMethod: 'post',
-		path: 'login',
-		requestMap: ({ body }) => ({
-			email: new Email(body.email),
-			password: stringTypeGuard(body.password),
-		}),
-		response: async (req) => {
-			const { email, password } = req;
+				const result = await authService.signIn(email, password);
+				if (result.msg === 'sign-in-failed') return new Conflict();
 
-			const result = await authService.signIn(email, password);
-			if (result.msg === 'sign-in-failed') return new Conflict();
-
-			return new Ok(result.cookie);
+				return new Ok(result.cookie);
+			},
 		},
-	};
-
-	return {
-		domain: 'auth',
-		version: 1,
-		routes: {
-			registerPostRequest,
-			loginPostRequest,
-		},
-	};
-};
+	},
+});
