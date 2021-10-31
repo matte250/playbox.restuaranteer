@@ -10,11 +10,11 @@ export interface User {
 
 export interface IAuthRepo {
 	getUserByEmail: (
-		email: string,
+		email: Email,
 	) => Promise<{ msg: 'user-found'; user: User } | { msg: 'user-not-found' }>;
 	getUsers: () => Promise<User[]>;
 	createUser: (
-		email: string,
+		email: Email,
 		passwordHash: string,
 		passwordSalt: string,
 		name: string,
@@ -30,8 +30,10 @@ const mapDbUser = (dbUser: DbUser): User => {
 };
 
 export const createAuthRepository = (client: PrismaClient): IAuthRepo => ({
-	getUserByEmail: async (email: string) => {
-		const user = await client.user.findUnique({ where: { email } });
+	getUserByEmail: async (email: Email) => {
+		const user = await client.user.findUnique({
+			where: { email: email.value },
+		});
 		if (!user) return { msg: 'user-not-found' };
 
 		return { msg: 'user-found', user: mapDbUser(user) };
@@ -41,12 +43,12 @@ export const createAuthRepository = (client: PrismaClient): IAuthRepo => ({
 	createUser: async (email, passwordHash, passwordSalt, name) => {
 		return await client.$transaction(async (tran) => {
 			const existingUser = await tran.user.findUnique({
-				where: { email },
+				where: { email: email.value },
 			});
 			if (existingUser) return { msg: 'email-already-in-use' };
 
 			const createdUser = await tran.user.create({
-				data: { email, passwordHash, passwordSalt, name },
+				data: { email: email.value, passwordHash, passwordSalt, name },
 			});
 			return { msg: 'user-created', createdUser: mapDbUser(createdUser) };
 		});

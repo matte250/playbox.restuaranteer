@@ -1,7 +1,6 @@
 import { IAuthRepo, User } from './respository';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { emailRegex } from '../../validation/regex';
 import { ACCESS_TOKEN_SECRET } from '../../env';
 import { Email } from '../../typeguard';
 
@@ -36,7 +35,7 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 		const passwordHash = await bcrypt.hash(password, salt);
 
 		const { msg } = await authRepo.createUser(
-			email.value,
+			email,
 			passwordHash,
 			salt,
 			name,
@@ -44,7 +43,7 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 		return msg;
 	},
 	signIn: async (email, password) => {
-		const res = await authRepo.getUserByEmail(email.value);
+		const res = await authRepo.getUserByEmail(email);
 		if (res.msg === 'user-not-found') return { msg: 'sign-in-failed' };
 
 		const match = await bcrypt.compare(password, res.user.passwordHash);
@@ -54,7 +53,7 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 		const userSession: UserSession = {
 			id: res.user.id,
 			name: res.user.name,
-			email: new Email(res.user.email),
+			email: res.user.email,
 		};
 
 		return {

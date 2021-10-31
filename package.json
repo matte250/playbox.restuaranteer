@@ -9,6 +9,7 @@
     "build:dev": "tsc",
     "start:dev": "npm ci && (nodemon -L --config nodemon.json src/index.ts & prisma generate --watch)",
     "test": "jest",
+    "test:coverage": "jest --coverage", 
     "lint": "eslint '*/**/*.{js,ts}'",
     "lint:fix": "eslint '*/**/*.{js,ts}' --fix"
   },
