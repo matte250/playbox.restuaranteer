@@ -1,9 +1,10 @@
 import { PrismaClient, User as DbUser } from '.prisma/client';
+import { Email } from '../../typeguard';
 
 export interface User {
 	id: number;
 	name: string;
-	email: string;
+	email: Email;
 	passwordHash: string;
 }
 
@@ -25,7 +26,7 @@ export interface IAuthRepo {
 
 const mapDbUser = (dbUser: DbUser): User => {
 	const { id, name, email, passwordHash } = dbUser;
-	return { id, name, email, passwordHash };
+	return { id, name, email: new Email(email), passwordHash };
 };
 
 export const createAuthRepository = (client: PrismaClient): IAuthRepo => ({
