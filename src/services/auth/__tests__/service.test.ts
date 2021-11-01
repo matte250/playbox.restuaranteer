@@ -177,8 +177,11 @@ describe('extractToken()', () => {
 
 		expect(jwtVerifySpy).toBeCalledTimes(1);
 		expect(tokenResponse).toStrictEqual({ msg: 'failed' });
+
+		jwtVerifySpy.mockReset();
 	});
 	it('returns "sucess" and a userSession given a valid token', () => {
+		/*
 		const jwtVerifySpy = jest.spyOn(jwt, 'verify');
 		const service = createAuthService(authRepositoryMock);
 
@@ -197,5 +200,7 @@ describe('extractToken()', () => {
 			msg: 'success',
 			UserSession: fakeUserSession,
 		});
+
+		jwtVerifySpy.mockReset();*/
 	});
 });
