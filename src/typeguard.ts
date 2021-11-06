@@ -17,3 +17,8 @@ export const stringTypeGuard = (value: unknown) => {
 	if (typeof value === 'string') return value;
 	else throw TypeError(`${value}(${typeof value}) is not a string`);
 };
+
+export const numberTypeGuard = (value: unknown) => {
+	if (typeof value === 'number') return value;
+	else throw TypeError(`${value}(${typeof value}) is not a number`);
+};

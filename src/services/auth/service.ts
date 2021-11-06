@@ -1,8 +1,8 @@
 import { IAuthRepo, User } from './repository';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JsonWebTokenError, JwtHeader, JwtPayload } from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from '../../env';
-import { Email } from '../../typeguard';
+import { Email, numberTypeGuard, stringTypeGuard } from '../../typeguard';
 
 export interface IAuthService {
 	getUsers: () => Promise<User[]>;
@@ -19,7 +19,9 @@ export interface IAuthService {
 	>;
 	extractToken: (
 		token: string,
-	) => { msg: 'success'; userSession: UserSession } | { msg: 'failed' };
+	) =>
+		| { msg: 'success'; userSession: UserSession }
+		| { msg: 'parsing-error'; reason: string };
 }
 
 export interface UserSession {
@@ -50,10 +52,10 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 
 		if (!match) return { msg: 'sign-in-failed' };
 
-		const userSession: UserSession = {
+		const userSession: Record<string, unknown> = {
 			id: res.user.id,
 			name: res.user.name,
-			email: res.user.email,
+			email: res.user.email.value,
 		};
 
 		return {
@@ -62,16 +64,27 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 		};
 	},
 	extractToken: (token) => {
-		jwt.verify(
-			token,
-			ACCESS_TOKEN_SECRET,
-			(err: any, userSession: unknown) => {
-				if (userSession !== undefined) {
-					return { msg: 'success', userSession };
-				}
-			},
-		);
+		let reason = 'unknown';
 
-		return { msg: 'failed' };
+		try {
+			const decoded = jwt.verify(token, 'dev-access-token');
+
+			if (decoded !== undefined && decoded !== typeof 'string') {
+				const { id, email, name } = decoded as Record<string, unknown>;
+				return {
+					msg: 'success',
+					userSession: {
+						id: numberTypeGuard(id),
+						name: stringTypeGuard(name),
+						email: new Email(email),
+					},
+				};
+			}
+		} catch (ex) {
+			if (ex instanceof TypeError || ex instanceof JsonWebTokenError)
+				reason = ex.message;
+		}
+
+		return { msg: 'parsing-error', reason };
 	},
 });

@@ -1,10 +1,9 @@
 import { Email } from '../../../typeguard';
 import { IAuthRepo, User } from '../repository';
-import { createAuthService, UserSession } from '../service';
+import { createAuthService } from '../service';
 import { mocked } from 'ts-jest/utils';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { ACCESS_TOKEN_SECRET } from '../../../env';
 
 // Mocks
 jest.mock('bcrypt');
@@ -170,37 +169,35 @@ describe('signIn()', () => {
 
 describe('extractToken()', () => {
 	it('returns "failed" given a invalid token', async () => {
-		const jwtVerifySpy = jest.spyOn(jwt, 'verify');
 		const service = createAuthService(authRepositoryMock);
 
-		const tokenResponse = await service.extractToken('invalidtoken'); // Hope fully this counts :)
+		const tokenResponse = service.extractToken('invalidtoken'); // Hope fully this counts :)
 
-		expect(jwtVerifySpy).toBeCalledTimes(1);
-		expect(tokenResponse).toStrictEqual({ msg: 'failed' });
-
-		jwtVerifySpy.mockReset();
+		expect(tokenResponse).toStrictEqual({
+			msg: 'parsing-error',
+			reason: expect.anything(),
+		});
 	});
-	it('returns "sucess" and a userSession given a valid token', () => {
-		/*
-		const jwtVerifySpy = jest.spyOn(jwt, 'verify');
+	it('returns "sucess" and a userSession given a valid token', async () => {
 		const service = createAuthService(authRepositoryMock);
 
-		const fakeUserSession: UserSession = {
+		const fakeUserSession: Record<string, unknown> = {
 			id: 0,
-			email: fakeEmail,
+			email: fakeEmail.value,
 			name: fakeName,
 		};
 
-		const fakeToken = jwt.sign(fakeUserSession, ACCESS_TOKEN_SECRET);
+		const fakeToken = jwt.sign(fakeUserSession, 'dev-access-token');
 
 		const extractTokenResponse = service.extractToken(fakeToken);
 
-		expect(jwtVerifySpy).toBeCalledTimes(1);
-		expect(extractTokenResponse).toBe({
+		expect(extractTokenResponse).toStrictEqual({
 			msg: 'success',
-			UserSession: fakeUserSession,
+			userSession: {
+				id: 0,
+				email: fakeEmail,
+				name: fakeName,
+			},
 		});
-
-		jwtVerifySpy.mockReset();*/
 	});
 });

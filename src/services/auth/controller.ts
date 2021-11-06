@@ -1,6 +1,7 @@
-import { Conflict, Controller, Ok, Route } from '../../createRouter.js';
-import { Email, stringTypeGuard } from '../../typeguard.js';
-import { IAuthService } from './service.js';
+import { Email, stringTypeGuard } from '../../typeguard';
+import { IAuthService } from './service';
+import { Controller } from '../../router/createRouter';
+import { Conflict, Ok } from '../../router/responseTypes';
 
 interface IRegisterPostRequest {
 	email: Email;

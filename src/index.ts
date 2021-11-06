@@ -2,15 +2,14 @@ import express, { NextFunction, Response } from 'express';
 import exphbs from 'express-handlebars';
 import connectLiveReload from 'connect-livereload';
 import livereload from 'livereload';
-import { createRouter } from './createRouter';
 import { createAuthController } from './services/auth/controller';
 import { createAuthRepository } from './services/auth/repository';
-import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import { IRequest } from './types';
-import { ENV, PORT, ACCESS_TOKEN_SECRET, DB_PASSWORD, DB_HOST } from './env';
+import { ENV, PORT } from './env';
 import { PrismaClient } from '.prisma/client';
 import { createAuthService } from './services/auth/service';
+import { createRouter } from './router/createRouter';
 
 const app = express();
 

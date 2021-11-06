@@ -4,7 +4,7 @@ export interface IRequest extends Request {
 	context: {
 		user?: {
 			email: string;
-			id: string;
+			id: number;
 			name: string;
 		};
 	};
