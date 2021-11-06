@@ -28,6 +28,7 @@
 		"prisma.prisma",
 		"esbenp.prettier-vscode",
 		"dbaeumer.vscode-eslint",
+		"firsttris.vscode-jest-runner",
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
