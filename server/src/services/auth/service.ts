@@ -1,6 +1,6 @@
 import { IAuthRepo, User } from './repository';
 import bcrypt from 'bcrypt';
-import jwt, { JsonWebTokenError, JwtHeader, JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from '../../env';
 import { Email, numberTypeGuard, stringTypeGuard } from '../../typeguard';
 
@@ -81,7 +81,7 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 				};
 			}
 		} catch (ex) {
-			if (ex instanceof TypeError || ex instanceof JsonWebTokenError)
+			if (ex instanceof TypeError || ex instanceof jwt.JsonWebTokenError)
 				reason = ex.message;
 		}
 
