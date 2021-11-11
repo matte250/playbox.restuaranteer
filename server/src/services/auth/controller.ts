@@ -37,7 +37,7 @@ export const createAuthController = (
 				const msg = await authService.createUser(name, email, password);
 				if (msg == 'email-already-in-use') return new Conflict();
 
-				return new Ok();
+				return new Conflict();
 			},
 		},
 		loginPostRequest: {
