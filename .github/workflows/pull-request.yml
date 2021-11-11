@@ -38,6 +38,6 @@ jobs:
       - name: Set up Env
         run: docker-compose up -d
       - name: Push DB schema to Env
-        run: docker exec playboxrestuaranteer_web_1 npx prisma db push 
+        run: docker exec playboxrestuaranteer_web_1 npx prisma migrate reset && npx prisma db push 
       - name: Run tests
         run: ./runTests.sh
