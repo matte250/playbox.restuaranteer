@@ -9,7 +9,9 @@ RUN npm ci
 
 COPY . . 
 
-RUN npm run build:prod
+RUN npx prisma generate
+
+RUN npm run build:dev
 
 EXPOSE 3000
-CMD [ "node", "dist/index.js" ]
+CMD [ "node", "--es-module-specifier-resolution=node", "dist/index.js" ]

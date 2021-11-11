@@ -5,4 +5,7 @@
     "editor.guides.bracketPairs": true,
     "editor.bracketPairColorization.enabled": true,
     "editor.guides.bracketPairsHorizontal": "active",
+    "karateRunner.reports.activityBarDisplayType": "Tree",
+    "karateRunner.tests.activityBarDisplayType": "Tag",
+    "karateRunner.tests.toTargetByGlob": "**/**/*.feature",
 }
