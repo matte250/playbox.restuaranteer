@@ -1,1 +1,2 @@
 [![Pull Request](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml/badge.svg?event=pull_request)](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml)
+[![Pull Request](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml/badge.svg?branch=main)](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml)
