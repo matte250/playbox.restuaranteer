@@ -1,1 +1,1 @@
-[![Pull Request](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml/badge.svg?event=branch_protection_rule)](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml)
+[![Pull Request](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml/badge.svg?event=pull_request)](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml)
