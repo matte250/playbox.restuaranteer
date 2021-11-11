@@ -1,1 +1,1 @@
-20.108.49.147
+[![Pull Request](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml/badge.svg?event=branch_protection_rule)](https://github.com/matte250/playbox.restuaranteer/actions/workflows/pull-request.yml)
