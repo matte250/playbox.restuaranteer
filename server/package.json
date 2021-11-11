@@ -1,0 +1,62 @@
+{
+  "name": "restuaranteer",
+  "version": "1.0.0",
+  "description": "Collect a set of restuarant reviews to generate options.",
+  "exports": "./dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build:prod": "tsc -p",
+    "build:dev": "tsc",
+    "start:dev": "npm ci && (nodemon -L --config nodemon.json src/index.ts & prisma generate --watch)",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint '*/**/*.{js,ts}'",
+    "lint:fix": "eslint '*/**/*.{js,ts}' --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matte250/playbox.restuaranteer.git"
+  },
+  "author": "Mattias Soroccos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matte250/playbox.restuaranteer/issues"
+  },
+  "homepage": "https://github.com/matte250/playbox.restuaranteer#readme",
+  "dependencies": {
+    "@prisma/client": "^3.2.1",
+    "bcrypt": "^5.0.1",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.3.3",
+    "http-status-codes": "^2.1.4",
+    "jsonwebtoken": "^8.5.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/connect-livereload": "^0.5.32",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/express": "^4.17.13",
+    "@types/express-handlebars": "^5.3.1",
+    "@types/jest": "^27.0.2",
+    "@types/jsonwebtoken": "^8.5.5",
+    "@types/livereload": "^0.9.1",
+    "@types/uuid": "^8.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
+    "connect-livereload": "^0.6.1",
+    "eslint": "^8.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.3.1",
+    "jest-mock-extended": "^2.0.4",
+    "livereload": "^0.9.3",
+    "nodemon": "^2.0.12",
+    "prettier": "^2.4.1",
+    "prisma": "^3.2.1",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.4"
+  }
+}

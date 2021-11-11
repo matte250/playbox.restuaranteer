@@ -2,11 +2,17 @@ version: "3.9"
 services:
   web:
     build: 
-      context: ./
-      dockerfile: ./Dockerfile
-    environment:
-      DB_HOST: "db"
-    depends_on:
-      - "db"
+      context: ./server
     ports:
       - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:secret@postgres:5432/resturanteer?schema=public
+  postgres:
+    image: postgres:14.0
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: resturanteer
+    ports:
+      - 5432:5432

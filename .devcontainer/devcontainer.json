@@ -25,14 +25,18 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"jakebathman.mysql-syntax",
-		"prisma.prisma"
+		"prisma.prisma",
+		"esbenp.prettier-vscode",
+		"dbaeumer.vscode-eslint",
+		"firsttris.vscode-jest-runner",
+		"kirkslota.karate-runner"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
 	// Uncomment the next line if you want start specific services in your Docker Compose config.
-	"runServices": ["db", "pgadmin", "postgres"],
+	"runServices": ["pgadmin", "postgres"],
 	"overrideCommand": false,
 
 	// Uncomment the next line if you want to keep your containers running after VS Code shuts down.
