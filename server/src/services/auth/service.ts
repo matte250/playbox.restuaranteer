@@ -1,27 +1,42 @@
-import { IAuthRepo, User } from './repository';
+import {
+	EmailAlreadyInUse,
+	IAuthRepo,
+	ReturnedUsers,
+	UserCreated,
+	UserNotFound,
+} from './repository';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from '../../env';
 import { Email, numberTypeGuard, stringTypeGuard } from '../../typeguard';
 
+export class TokenCreated {
+	constructor(readonly token: string) {}
+}
+
+export class TokenCreationFailed {}
+
+export class UserSessionCreated {
+	constructor(readonly userSession: UserSession) {}
+}
+
+export class UserSessionCreationFailed {
+	constructor(readonly reason: string) {}
+}
 export interface IAuthService {
-	getUsers: () => Promise<User[]>;
+	getUsers: () => Promise<ReturnedUsers>;
 	createUser: (
 		name: string,
 		email: Email,
 		password: string,
-	) => Promise<'user-created' | 'email-already-in-use'>;
+	) => Promise<UserCreated | EmailAlreadyInUse>;
 	signIn: (
 		email: Email,
 		password: string,
-	) => Promise<
-		{ msg: 'sign-in-success'; cookie: string } | { msg: 'sign-in-failed' }
-	>;
+	) => Promise<TokenCreated | TokenCreationFailed>;
 	extractToken: (
 		token: string,
-	) =>
-		| { msg: 'success'; userSession: UserSession }
-		| { msg: 'parsing-error'; reason: string };
+	) => UserSessionCreated | UserSessionCreationFailed;
 }
 
 export interface UserSession {
@@ -36,32 +51,31 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 		const salt = await bcrypt.genSalt(10);
 		const passwordHash = await bcrypt.hash(password, salt);
 
-		const { msg } = await authRepo.createUser(
+		const response = await authRepo.createUser(
 			email,
 			passwordHash,
 			salt,
 			name,
 		);
-		return msg;
+		return response;
 	},
 	signIn: async (email, password) => {
-		const res = await authRepo.getUserByEmail(email);
-		if (res.msg === 'user-not-found') return { msg: 'sign-in-failed' };
+		const getUserResponse = await authRepo.getUserByEmail(email);
+		if (getUserResponse instanceof UserNotFound)
+			return new TokenCreationFailed();
 
-		const match = await bcrypt.compare(password, res.user.passwordHash);
+		const { user } = getUserResponse;
+		const match = await bcrypt.compare(password, user.passwordHash);
 
-		if (!match) return { msg: 'sign-in-failed' };
+		if (!match) return new TokenCreationFailed();
 
 		const userSession: Record<string, unknown> = {
-			id: res.user.id,
-			name: res.user.name,
-			email: res.user.email.value,
+			id: user.id,
+			name: user.name,
+			email: user.email.value,
 		};
 
-		return {
-			msg: 'sign-in-success',
-			cookie: jwt.sign(userSession, ACCESS_TOKEN_SECRET),
-		};
+		return new TokenCreated(jwt.sign(userSession, ACCESS_TOKEN_SECRET));
 	},
 	extractToken: (token) => {
 		let reason = 'unknown';
@@ -71,20 +85,17 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 
 			if (decoded !== undefined && decoded !== typeof 'string') {
 				const { id, email, name } = decoded as Record<string, unknown>;
-				return {
-					msg: 'success',
-					userSession: {
-						id: numberTypeGuard(id),
-						name: stringTypeGuard(name),
-						email: new Email(email),
-					},
-				};
+				return new UserSessionCreated({
+					id: numberTypeGuard(id),
+					name: stringTypeGuard(name),
+					email: new Email(email),
+				});
 			}
 		} catch (ex) {
 			if (ex instanceof TypeError || ex instanceof jwt.JsonWebTokenError)
 				reason = ex.message;
 		}
 
-		return { msg: 'parsing-error', reason };
+		return new UserSessionCreationFailed(reason);
 	},
 });
