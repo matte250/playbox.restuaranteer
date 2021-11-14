@@ -81,7 +81,7 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 		let reason = 'unknown';
 
 		try {
-			const decoded = jwt.verify(token, 'dev-access-token');
+			const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
 
 			if (decoded !== undefined && decoded !== typeof 'string') {
 				const { id, email, name } = decoded as Record<string, unknown>;

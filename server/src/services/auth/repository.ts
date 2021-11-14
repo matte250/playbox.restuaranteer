@@ -58,7 +58,7 @@ export const createAuthRepository = (client: PrismaClient): IAuthRepo => ({
 			const existingUser = await tran.user.findUnique({
 				where: { email: email.value },
 			});
-			if (existingUser) return '';
+			if (existingUser) return new EmailAlreadyInUse();
 
 			const createdUser = await tran.user.create({
 				data: { email: email.value, passwordHash, passwordSalt, name },

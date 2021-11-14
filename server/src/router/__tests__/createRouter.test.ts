@@ -16,13 +16,7 @@ beforeEach(() => {
 	mockRes = mockResponse();
 });
 
-const fakeController = (): Controller<{
-	testGet: {
-		value: string;
-	};
-	testPost: unknown;
-	testPut: unknown;
-}> => ({
+const fakeController = (): Controller => ({
 	domain: 'test',
 	version: 1,
 	routes: {

@@ -1,7 +1,8 @@
 import { Email, stringTypeGuard } from '../../typeguard';
-import { IAuthService } from './service';
-import { Controller } from '../../router/createRouter';
+import { IAuthService, TokenCreationFailed } from './service';
+import { Controller, Route } from '../../router/createRouter';
 import { Conflict, Ok } from '../../router/responseTypes';
+import { EmailAlreadyInUse } from './repository';
 
 interface IRegisterPostRequest {
 	email: Email;
@@ -16,10 +17,7 @@ interface ILoginPostRequest {
 
 export const createAuthController = (
 	authService: IAuthService,
-): Controller<{
-	registerPostRequest: IRegisterPostRequest;
-	loginPostRequest: ILoginPostRequest;
-}> => ({
+): Controller => ({
 	domain: 'auth',
 	version: 1,
 	routes: {
@@ -34,12 +32,17 @@ export const createAuthController = (
 			response: async (req) => {
 				const { email, name, password } = req;
 
-				const msg = await authService.createUser(name, email, password);
-				if (msg == 'email-already-in-use') return new Conflict();
+				const createUserResponse = await authService.createUser(
+					name,
+					email,
+					password,
+				);
+				if (createUserResponse instanceof EmailAlreadyInUse)
+					return new Conflict();
 
 				return new Ok();
 			},
-		},
+		} as Route<IRegisterPostRequest>,
 		loginPostRequest: {
 			httpMethod: 'post',
 			path: 'login',
@@ -50,11 +53,12 @@ export const createAuthController = (
 			response: async (req) => {
 				const { email, password } = req;
 
-				const result = await authService.signIn(email, password);
-				if (result.msg === 'sign-in-failed') return new Conflict();
+				const signInResult = await authService.signIn(email, password);
+				if (signInResult instanceof TokenCreationFailed)
+					return new Conflict();
 
-				return new Ok(result.cookie);
+				return new Ok(signInResult.token);
 			},
-		},
+		} as Route<ILoginPostRequest>,
 	},
 });

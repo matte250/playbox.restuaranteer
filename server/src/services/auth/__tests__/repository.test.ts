@@ -1,5 +1,12 @@
 import { PrismaClient, User as DbUser } from '.prisma/client';
-import { createAuthRepository } from '../repository';
+import {
+	createAuthRepository,
+	EmailAlreadyInUse,
+	ReturnedUser,
+	ReturnedUsers,
+	UserCreated,
+	UserNotFound,
+} from '../repository';
 import { Email } from '../../../typeguard';
 import { User } from '../repository';
 import { mockPrismaClient } from '../../../mocks/prismaClientMock';
@@ -23,7 +30,7 @@ beforeEach(() => {
 });
 
 describe('getUserByEmail()', () => {
-	it('returns "user-not-found" given a email that is not stored', async () => {
+	it('returns UserNotFound given a email that is not stored', async () => {
 		prismaClientMock.user.findUnique = jest.fn().mockReturnValue(null);
 		const authRepository = createAuthRepository(prismaClientMock);
 
@@ -35,9 +42,9 @@ describe('getUserByEmail()', () => {
 		expect(prismaClientMock.user.findUnique).toBeCalledWith({
 			where: { email: fakeEmail.value },
 		});
-		expect(getUserByEmailResponse).toStrictEqual({ msg: 'user-not-found' });
+		expect(getUserByEmailResponse).toStrictEqual(new UserNotFound());
 	});
-	it('returns "user-found" and user when given a email that is stored', async () => {
+	it('returns ReturnedUser and user when given a email that is stored', async () => {
 		prismaClientMock.user.findUnique = jest
 			.fn()
 			.mockReturnValue(fakeDbUser);
@@ -51,20 +58,19 @@ describe('getUserByEmail()', () => {
 		expect(prismaClientMock.user.findUnique).toBeCalledWith({
 			where: { email: fakeEmail.value },
 		});
-		expect(getUserByEmailResponse).toStrictEqual({
-			msg: 'user-found',
-			user: {
+		expect(getUserByEmailResponse).toStrictEqual(
+			new ReturnedUser({
 				id: fakeDbUser.id,
 				email: new Email(fakeDbUser.email),
 				name: fakeDbUser.name,
 				passwordHash: fakeDbUser.passwordHash,
-			},
-		});
+			}),
+		);
 	});
 });
 
 describe('getUsers()', () => {
-	it('returns all users', async () => {
+	it('returns ReturnedUsers', async () => {
 		const fakeUsers: DbUser[] = [
 			{
 				id: 0,
@@ -102,12 +108,14 @@ describe('getUsers()', () => {
 		];
 
 		expect(prismaClientMock.user.findMany).toBeCalledTimes(1);
-		expect(getUsersResponse).toStrictEqual(expectedUsers);
+		expect(getUsersResponse).toStrictEqual(
+			new ReturnedUsers(expectedUsers),
+		);
 	});
 });
 
 describe('createUser()', () => {
-	it('returns "email-already-in-use" given a email already associated with a user', async () => {
+	it('returns EmailAlreadyInUse given a email already associated with a user', async () => {
 		prismaClientMock.user.findUnique = jest
 			.fn()
 			.mockReturnValue({ email: 'test@test.test' });
@@ -125,11 +133,9 @@ describe('createUser()', () => {
 		expect(prismaClientMock.user.findUnique).toHaveBeenCalledWith({
 			where: { email: fakeEmail.value },
 		});
-		expect(createUserResponse).toStrictEqual({
-			msg: 'email-already-in-use',
-		});
+		expect(createUserResponse).toStrictEqual(new EmailAlreadyInUse());
 	});
-	it('returns "user-created" and a User given valid user credentials', async () => {
+	it('returns UserCreated and a User given valid user credentials', async () => {
 		prismaClientMock.user.findUnique = jest.fn().mockReturnValue(null);
 		prismaClientMock.user.create = jest.fn().mockReturnValue(fakeDbUser);
 
@@ -157,17 +163,13 @@ describe('createUser()', () => {
 			},
 		});
 
-		expect(createUserResponse).toStrictEqual<{
-			msg: 'user-created';
-			createdUser: User;
-		}>({
-			msg: 'user-created',
-			createdUser: {
+		expect(createUserResponse).toStrictEqual(
+			new UserCreated({
 				id: fakeDbUser.id,
 				email: new Email(fakeDbUser.email),
 				name: fakeDbUser.name,
 				passwordHash: fakeDbUser.passwordHash,
-			},
-		});
+			}),
+		);
 	});
 });
