@@ -8,20 +8,31 @@ export interface User {
 	passwordHash: string;
 }
 
+export class ReturnedUser {
+	constructor(readonly user: User) {}
+}
+
+export class UserNotFound {}
+
+export class ReturnedUsers {
+	constructor(readonly users: User[]) {}
+}
+
+export class UserCreated {
+	constructor(readonly createdUser: User) {}
+}
+
+export class EmailAlreadyInUse {}
+
 export interface IAuthRepo {
-	getUserByEmail: (
-		email: Email,
-	) => Promise<{ msg: 'user-found'; user: User } | { msg: 'user-not-found' }>;
-	getUsers: () => Promise<User[]>;
+	getUserByEmail: (email: Email) => Promise<ReturnedUser | UserNotFound>;
+	getUsers: () => Promise<ReturnedUsers>;
 	createUser: (
 		email: Email,
 		passwordHash: string,
 		passwordSalt: string,
 		name: string,
-	) => Promise<
-		| { msg: 'user-created'; createdUser: User }
-		| { msg: 'email-already-in-use' }
-	>;
+	) => Promise<UserCreated | EmailAlreadyInUse>;
 }
 
 const mapDbUser = (dbUser: DbUser): User => {
@@ -34,23 +45,25 @@ export const createAuthRepository = (client: PrismaClient): IAuthRepo => ({
 		const user = await client.user.findUnique({
 			where: { email: email.value },
 		});
-		if (!user) return { msg: 'user-not-found' };
+		if (!user) return new UserNotFound();
 
-		return { msg: 'user-found', user: mapDbUser(user) };
+		return new ReturnedUser(mapDbUser(user));
 	},
 	getUsers: async () =>
-		(await client.user.findMany()).map((x) => mapDbUser(x)),
+		new ReturnedUsers(
+			(await client.user.findMany()).map((x) => mapDbUser(x)),
+		),
 	createUser: async (email, passwordHash, passwordSalt, name) => {
 		return await client.$transaction(async (tran) => {
 			const existingUser = await tran.user.findUnique({
 				where: { email: email.value },
 			});
-			if (existingUser) return { msg: 'email-already-in-use' };
+			if (existingUser) return new EmailAlreadyInUse();
 
 			const createdUser = await tran.user.create({
 				data: { email: email.value, passwordHash, passwordSalt, name },
 			});
-			return { msg: 'user-created', createdUser: mapDbUser(createdUser) };
+			return new UserCreated(mapDbUser(createdUser));
 		});
 	},
 });

@@ -4,12 +4,12 @@ import { IRequest } from '../types';
 import { IResponse } from './responseTypes';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Controllers = Controller<Record<string, any>>[];
+export type Controllers = Controller[];
 
-export type Controller<T extends Record<string, unknown>> = {
+export type Controller = {
 	domain: string;
 	version: number;
-	routes: { [Key in keyof T]: Route<T[Key]> };
+	routes: { [key: string]: Route };
 };
 
 interface RequestMap<T> {
@@ -20,7 +20,7 @@ interface RequestMap<T> {
 	}): T;
 }
 
-export type Route<T> = {
+export type Route<T = any> = {
 	path: string;
 	httpMethod: HttpMethod;
 } & (
