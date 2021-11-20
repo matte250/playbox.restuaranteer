@@ -1,6 +1,6 @@
 Feature: Auth
 Background:
-    * url baseUrl + '/auth/v1'
+    * url baseUrl + 'api/auth/v1'
 
 Scenario: Create new user
     * def registerRequest = 
