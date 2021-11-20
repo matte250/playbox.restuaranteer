@@ -57,9 +57,10 @@ describe('createRouter()', () => {
 		expect(routes.length).toBe(3);
 		expect(routes).toStrictEqual(
 			expect.arrayContaining([
-				{ path: 'api/test/v1/test1', method: 'get' },
-				{ path: 'api/test/v1/test2', method: 'post' },
-				{ path: 'api/test/v1/test3', method: 'put' },
+				{ path: '/api/test/v1/test1', method: 'get' },
+				{ path: '/api/test/v1/test2', method: 'post' },
+				{ path: '/
+				api/test/v1/test3', method: 'put' },
 			]),
 		);
 	});
