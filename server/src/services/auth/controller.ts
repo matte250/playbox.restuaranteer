@@ -63,10 +63,7 @@ export const createAuthController = (
 		userGetRequest: {
 			httpMethod: 'get',
 			path: 'user/:id',
-			requestMap: ({ param }) => {
-				console.log('++', param);
-				return { id: numberTypeGuard(param.id) };
-			},
+			requestMap: ({ param }) => ({ id: numberTypeGuard(param.id) }),
 			response: async ({ id }) => {
 				const getUserResult = await authService.getUser(id);
 				if (getUserResult instanceof UserNotFound)

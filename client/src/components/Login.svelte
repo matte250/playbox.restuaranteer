@@ -23,7 +23,6 @@
 		if(!userResponse.success) return;
 
 		currentUserStore.set(userResponse.data.result)
-		console.log('++',userResponse);
 	}
 </script>
 
