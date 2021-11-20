@@ -2,6 +2,7 @@ import { PrismaClient, User as DbUser } from '.prisma/client';
 import {
 	createAuthRepository,
 	EmailAlreadyInUse,
+	mapDbUser,
 	ReturnedUser,
 	ReturnedUsers,
 	UserCreated,
@@ -10,14 +11,16 @@ import {
 import { Email } from '../../../typeguard';
 import { User } from '../repository';
 import { mockPrismaClient } from '../../../mocks/prismaClientMock';
+import { DeepMockProxy } from 'jest-mock-extended';
 
 // Mock
-let prismaClientMock: PrismaClient;
+let prismaClientMock: DeepMockProxy<PrismaClient>;
 
 // Fakes
+const fakeId = 0;
 const fakeEmail = new Email('test@test.test');
 const fakeDbUser: DbUser = {
-	id: 0,
+	id: fakeId,
 	email: fakeEmail.value,
 	name: '',
 	passwordHash: '',
@@ -26,12 +29,12 @@ const fakeDbUser: DbUser = {
 
 // Tests
 beforeEach(() => {
-	prismaClientMock = mockPrismaClient();
+	prismaClientMock = mockPrismaClient() as DeepMockProxy<PrismaClient>;
 });
 
 describe('getUserByEmail()', () => {
 	it('returns UserNotFound given a email that is not stored', async () => {
-		prismaClientMock.user.findUnique = jest.fn().mockReturnValue(null);
+		prismaClientMock.user.findUnique.mockResolvedValue(null);
 		const authRepository = createAuthRepository(prismaClientMock);
 
 		const getUserByEmailResponse = await authRepository.getUserByEmail(
@@ -45,12 +48,10 @@ describe('getUserByEmail()', () => {
 		expect(getUserByEmailResponse).toStrictEqual(new UserNotFound());
 	});
 	it('returns ReturnedUser and user when given a email that is stored', async () => {
-		prismaClientMock.user.findUnique = jest
-			.fn()
-			.mockReturnValue(fakeDbUser);
+		prismaClientMock.user.findUnique.mockResolvedValue(fakeDbUser);
 		const authRepository = createAuthRepository(prismaClientMock);
 
-		const getUserByEmailResponse = await authRepository.getUserByEmail(
+		const getUserByEmailResult = await authRepository.getUserByEmail(
 			fakeEmail,
 		);
 
@@ -58,7 +59,7 @@ describe('getUserByEmail()', () => {
 		expect(prismaClientMock.user.findUnique).toBeCalledWith({
 			where: { email: fakeEmail.value },
 		});
-		expect(getUserByEmailResponse).toStrictEqual(
+		expect(getUserByEmailResult).toStrictEqual(
 			new ReturnedUser({
 				id: fakeDbUser.id,
 				email: new Email(fakeDbUser.email),
@@ -66,6 +67,36 @@ describe('getUserByEmail()', () => {
 				passwordHash: fakeDbUser.passwordHash,
 			}),
 		);
+	});
+});
+
+describe('getUserById()', () => {
+	it('returns UserNotFound given a id not assosicated with a stored user', async () => {
+		prismaClientMock.user.findUnique.mockResolvedValue(null);
+
+		const authReposistory = createAuthRepository(prismaClientMock);
+
+		const result = await authReposistory.getUserById(fakeId);
+
+		expect(prismaClientMock.user.findUnique).toBeCalledTimes(1);
+		expect(prismaClientMock.user.findUnique).toBeCalledWith({
+			where: { id: fakeId },
+		});
+		expect(result).toStrictEqual(new UserNotFound());
+	});
+
+	it('returns ReturnedUser and user given a id assosciated with a stored user', async () => {
+		prismaClientMock.user.findUnique.mockResolvedValue(fakeDbUser);
+
+		const authReposistory = createAuthRepository(prismaClientMock);
+
+		const result = await authReposistory.getUserById(fakeDbUser.id);
+
+		expect(prismaClientMock.user.findUnique).toBeCalledTimes(1);
+		expect(prismaClientMock.user.findUnique).toBeCalledWith({
+			where: { id: fakeDbUser.id },
+		});
+		expect(result).toStrictEqual(new ReturnedUser(mapDbUser(fakeDbUser)));
 	});
 });
 
@@ -87,7 +118,7 @@ describe('getUsers()', () => {
 				passwordSalt: '',
 			},
 		];
-		prismaClientMock.user.findMany = jest.fn().mockReturnValue(fakeUsers);
+		prismaClientMock.user.findMany.mockResolvedValue(fakeUsers);
 		const authReposistory = createAuthRepository(prismaClientMock);
 
 		const getUsersResponse = await authReposistory.getUsers();
@@ -116,9 +147,7 @@ describe('getUsers()', () => {
 
 describe('createUser()', () => {
 	it('returns EmailAlreadyInUse given a email already associated with a user', async () => {
-		prismaClientMock.user.findUnique = jest
-			.fn()
-			.mockReturnValue({ email: 'test@test.test' });
+		prismaClientMock.user.findUnique.mockResolvedValue(fakeDbUser);
 
 		const authReposistory = createAuthRepository(prismaClientMock);
 
@@ -136,8 +165,8 @@ describe('createUser()', () => {
 		expect(createUserResponse).toStrictEqual(new EmailAlreadyInUse());
 	});
 	it('returns UserCreated and a User given valid user credentials', async () => {
-		prismaClientMock.user.findUnique = jest.fn().mockReturnValue(null);
-		prismaClientMock.user.create = jest.fn().mockReturnValue(fakeDbUser);
+		prismaClientMock.user.findUnique.mockResolvedValue(null);
+		prismaClientMock.user.create.mockResolvedValue(fakeDbUser);
 
 		const authReposistory = createAuthRepository(prismaClientMock);
 

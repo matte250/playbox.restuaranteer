@@ -2,12 +2,32 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch via npm",
+            "name": "Start Server",
             "type": "node",
             "request": "launch",
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/server",
             "runtimeExecutable": "npm",
-            "runtimeArgs": ["run-script", "start:dev"]
+            "runtimeArgs": ["run", "start:dev"],
+            "presentation": {
+                "hidden": false,
+                "group": "",
+                "order": 1,
+                "panel": "new",
+            }
+        },
+        {
+            "name": "Start Client",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/client",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"],
+            "presentation": {
+                "hidden": false,
+                "group": "",
+                "order": 1,
+                "panel": "new",
+            }
         },
         {
             "name": "Docker: Attach to Node",
@@ -19,6 +39,18 @@
             "remoteRoot": "/usr/src/app",
             "restart": true,
             "reloadOnAttatch": false
+            
+        }
+    ],
+    "compounds": [
+        {
+            "presentation": {
+                "hidden": false,
+                "group": "1",
+                "order": 1
+            },
+            "name": "Server/Client",
+            "configurations": ["Start Server", "Start Client"]
         }
     ]
 }
