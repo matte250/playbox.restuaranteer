@@ -19,6 +19,9 @@ jobs:
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_STORAGE_AUTH }}
+      - name: npm ci
+        working-directory: ./client
+        run: npm ci
       - name: build static site
         working-directory: ./client
         run: npm run build
