@@ -26,6 +26,7 @@ export class EmailAlreadyInUse {}
 
 export interface IAuthRepo {
 	getUserByEmail: (email: Email) => Promise<ReturnedUser | UserNotFound>;
+	getUserById: (id: number) => Promise<ReturnedUser | UserNotFound>;
 	getUsers: () => Promise<ReturnedUsers>;
 	createUser: (
 		email: Email,
@@ -35,7 +36,7 @@ export interface IAuthRepo {
 	) => Promise<UserCreated | EmailAlreadyInUse>;
 }
 
-const mapDbUser = (dbUser: DbUser): User => {
+export const mapDbUser = (dbUser: DbUser): User => {
 	const { id, name, email, passwordHash } = dbUser;
 	return { id, name, email: new Email(email), passwordHash };
 };
@@ -65,5 +66,10 @@ export const createAuthRepository = (client: PrismaClient): IAuthRepo => ({
 			});
 			return new UserCreated(mapDbUser(createdUser));
 		});
+	},
+	getUserById: async (id) => {
+		const user = await client.user.findUnique({ where: { id } });
+		if (!user) return new UserNotFound();
+		return new ReturnedUser(mapDbUser(user));
 	},
 });

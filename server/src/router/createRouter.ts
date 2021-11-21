@@ -97,7 +97,7 @@ export const createRouter = (controllers: Controllers) => {
 		Object.keys(controller.routes).forEach((key) => {
 			const route = controller.routes[key];
 			router[route.httpMethod](
-				`/${controller.domain}/v${controller.version}/${route.path}`,
+				`/api/${controller.domain}/v${controller.version}/${route.path}`,
 				createRequestFunction(route) as any, // It does not like IRequest, it wants request instead even tho it is a lie,
 			);
 		});

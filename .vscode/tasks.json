@@ -1,0 +1,59 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "presentation": {
+      "panel": "shared"
+    },
+    "tasks": [
+      {
+        "label": "Start server",
+        "type": "shell",
+        "command": "npm",
+        "args": [
+          "run",
+          "start:dev"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/server"
+        },
+        "group": "test",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared",
+          "group": "services"
+        }
+      },
+      {
+        "label": "Start client",
+        "type": "shell",
+        "command": "npm",
+        "args": [
+          "run",
+          "dev"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/client"
+        },
+        "group": "test",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared",
+          "group": "services"
+        }
+      },
+      {
+        "label": "Start all services",
+        "dependsOn": [
+          "Start server",
+          "Start client"
+        ],
+        "presentation": {
+          "group": "services",
+          "focus": false,
+          "panel": "shared",
+        },
+        "problemMatcher": []
+      }
+    ]
+  }

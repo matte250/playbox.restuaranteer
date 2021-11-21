@@ -20,5 +20,11 @@ export const stringTypeGuard = (value: unknown) => {
 
 export const numberTypeGuard = (value: unknown) => {
 	if (typeof value === 'number') return value;
-	else throw TypeError(`${value}(${typeof value}) is not a number`);
+
+	if (typeof value === 'string') {
+		const parsedValue = parseFloat(value);
+		if (parsedValue !== NaN) return parsedValue;
+	}
+
+	throw TypeError(`${value}(${typeof value}) is not a number`);
 };

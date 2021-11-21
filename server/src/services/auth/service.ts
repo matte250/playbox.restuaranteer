@@ -1,6 +1,7 @@
 import {
 	EmailAlreadyInUse,
 	IAuthRepo,
+	ReturnedUser,
 	ReturnedUsers,
 	UserCreated,
 	UserNotFound,
@@ -25,6 +26,7 @@ export class UserSessionCreationFailed {
 }
 export interface IAuthService {
 	getUsers: () => Promise<ReturnedUsers>;
+	getUser: (id: number) => Promise<ReturnedUser | UserNotFound>;
 	createUser: (
 		name: string,
 		email: Email,
@@ -47,6 +49,7 @@ export interface UserSession {
 
 export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 	getUsers: async () => await authRepo.getUsers(),
+	getUser: async (id) => await authRepo.getUserById(id),
 	createUser: async (name, email, password) => {
 		const salt = await bcrypt.genSalt(10);
 		const passwordHash = await bcrypt.hash(password, salt);

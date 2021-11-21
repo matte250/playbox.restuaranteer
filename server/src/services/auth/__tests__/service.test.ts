@@ -19,25 +19,21 @@ import { mocked } from 'ts-jest/utils';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from '../../../env';
+import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 
 // Mocks
 jest.mock('bcrypt');
 let bcryptMock: typeof bcrypt;
 
-const createAuthRepositoryMock = (): IAuthRepo => ({
-	getUserByEmail: jest.fn(),
-	getUsers: jest.fn(),
-	createUser: jest.fn(),
-});
-
-let authRepositoryMock: IAuthRepo;
+let authRepositoryMock: DeepMockProxy<IAuthRepo>;
 
 const fakeName = 'Tester';
 const fakeEmail = new Email('test@test.test');
 const fakePassword = 'testtest';
+const fakeId = 0;
 
 beforeEach(() => {
-	authRepositoryMock = createAuthRepositoryMock();
+	authRepositoryMock = mockDeep<IAuthRepo>();
 	bcryptMock = mocked(bcrypt, true);
 });
 
@@ -58,13 +54,44 @@ describe('getUsers()', () => {
 				passwordHash: '',
 			},
 		] as User[]);
-		authRepositoryMock.getUsers = jest.fn().mockReturnValue(fakeUsers);
+		authRepositoryMock.getUsers.mockResolvedValue(fakeUsers);
 		const service = createAuthService(authRepositoryMock);
 		const users = await service.getUsers();
 
 		expect(authRepositoryMock.getUsers).toHaveBeenCalledTimes(1);
 		expect(users).toBeInstanceOf(ReturnedUsers);
 		expect(users).toEqual(fakeUsers);
+	});
+});
+
+describe('getUser()', () => {
+	it('returns UserNotFound given a id not associated with a user', async () => {
+		const fakeUserNotFound = new UserNotFound();
+
+		authRepositoryMock.getUserById.mockResolvedValue(new UserNotFound());
+
+		const service = createAuthService(authRepositoryMock);
+		const result = await service.getUser(fakeId);
+
+		expect(authRepositoryMock.getUserById).toBeCalledTimes(1);
+		expect(authRepositoryMock.getUserById).toBeCalledWith(fakeId);
+		expect(result).toStrictEqual(fakeUserNotFound);
+	});
+	it('returns ReturnedUser with a user given a id associated with a user', async () => {
+		const fakeReturnedUser = new ReturnedUser({
+			id: fakeId,
+			email: fakeEmail,
+			name: fakeName,
+			passwordHash: fakePassword,
+		});
+		authRepositoryMock.getUserById.mockResolvedValue(fakeReturnedUser);
+
+		const service = createAuthService(authRepositoryMock);
+		const result = await service.getUser(fakeId);
+
+		expect(authRepositoryMock.getUserById).toBeCalledTimes(1);
+		expect(authRepositoryMock.getUserById).toBeCalledWith(fakeId);
+		expect(result).toStrictEqual(fakeReturnedUser);
 	});
 });
 
@@ -76,9 +103,7 @@ describe('createUser()', () => {
 			name: fakeName,
 			passwordHash: '',
 		});
-		authRepositoryMock.createUser = jest
-			.fn()
-			.mockReturnValue(fakeUserCreated);
+		authRepositoryMock.createUser.mockResolvedValue(fakeUserCreated);
 
 		bcryptMock.genSalt = jest.fn().mockReturnValue('salt');
 		bcryptMock.hash = jest.fn().mockReturnValue('hash');
@@ -102,9 +127,7 @@ describe('createUser()', () => {
 	});
 	it('returns EmailAlreadyInUse given an existing email already exists', async () => {
 		const fakeEmailAlreadyInUse = new EmailAlreadyInUse();
-		authRepositoryMock.createUser = jest
-			.fn()
-			.mockReturnValue(fakeEmailAlreadyInUse);
+		authRepositoryMock.createUser.mockResolvedValue(fakeEmailAlreadyInUse);
 
 		bcryptMock.genSalt = jest.fn().mockReturnValue('salt');
 		bcryptMock.hash = jest.fn().mockReturnValue('hash');
@@ -130,9 +153,8 @@ describe('createUser()', () => {
 
 describe('signIn()', () => {
 	it('returns TokenCreationFailed when a user with a given email is not found', async () => {
-		authRepositoryMock.getUserByEmail = jest
-			.fn()
-			.mockReturnValue(new UserNotFound());
+		authRepositoryMock.getUserByEmail.mockResolvedValue(new UserNotFound());
+
 		const service = createAuthService(authRepositoryMock);
 
 		const signInResponse = await service.signIn(fakeEmail, fakePassword);
@@ -144,7 +166,7 @@ describe('signIn()', () => {
 		expect(signInResponse).toStrictEqual(new TokenCreationFailed());
 	});
 	it('returns TokenCreationFailed when a user with a given password does not match', async () => {
-		authRepositoryMock.getUserByEmail = jest.fn().mockReturnValue(
+		authRepositoryMock.getUserByEmail.mockResolvedValue(
 			new ReturnedUser({
 				id: 0,
 				name: fakeName,
@@ -152,6 +174,7 @@ describe('signIn()', () => {
 				passwordHash: 'PRETEND-HASH',
 			}),
 		);
+
 		bcryptMock.compare = jest.fn().mockReturnValue(false); // Makes so that no password match
 		const service = createAuthService(authRepositoryMock);
 
@@ -164,7 +187,7 @@ describe('signIn()', () => {
 		expect(signInResponse).toStrictEqual(new TokenCreationFailed());
 	});
 	it('returns TokenCreated when a user with a given email exists and password hash matches', async () => {
-		authRepositoryMock.getUserByEmail = jest.fn().mockReturnValue(
+		authRepositoryMock.getUserByEmail.mockResolvedValue(
 			new ReturnedUser({
 				id: 0,
 				name: fakeName,

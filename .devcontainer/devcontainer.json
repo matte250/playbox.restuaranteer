@@ -29,7 +29,8 @@
 		"esbenp.prettier-vscode",
 		"dbaeumer.vscode-eslint",
 		"firsttris.vscode-jest-runner",
-		"kirkslota.karate-runner"
+		"kirkslota.karate-runner",
+		"svelte.svelte-vscode"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

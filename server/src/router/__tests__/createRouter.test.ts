@@ -46,7 +46,7 @@ const fakeController = (): Controller => ({
 });
 
 describe('createRouter()', () => {
-	it('returns a router that contains endpoints with correct paths({domain}/v{version}/{path})', () => {
+	it('returns a router that contains endpoints with correct paths(api/{domain}/v{version}/{path})', () => {
 		const router = createRouter([fakeController()]);
 
 		const routes = router.stack.map((x) => ({
@@ -57,9 +57,9 @@ describe('createRouter()', () => {
 		expect(routes.length).toBe(3);
 		expect(routes).toStrictEqual(
 			expect.arrayContaining([
-				{ path: '/test/v1/test1', method: 'get' },
-				{ path: '/test/v1/test2', method: 'post' },
-				{ path: '/test/v1/test3', method: 'put' },
+				{ path: '/api/test/v1/test1', method: 'get' },
+				{ path: '/api/test/v1/test2', method: 'post' },
+				{ path: '/api/test/v1/test3', method: 'put' },
 			]),
 		);
 	});

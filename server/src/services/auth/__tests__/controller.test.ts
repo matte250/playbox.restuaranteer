@@ -2,8 +2,13 @@ import { IAuthService, TokenCreated, TokenCreationFailed } from '../service';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { createAuthController } from '../controller';
 import { Email } from '../../../typeguard';
-import { Conflict, Ok } from '../../../router/responseTypes';
-import { EmailAlreadyInUse, UserCreated } from '../repository';
+import { Conflict, NotFound, Ok } from '../../../router/responseTypes';
+import {
+	EmailAlreadyInUse,
+	ReturnedUser,
+	UserCreated,
+	UserNotFound,
+} from '../repository';
 let authServiceMock: DeepMockProxy<IAuthService>;
 
 beforeEach(() => {
@@ -94,5 +99,48 @@ describe('POST auth/v1/login', () => {
 		expect(authServiceMock.signIn).toBeCalledTimes(1);
 		expect(authServiceMock.signIn).toBeCalledWith(fakeEmail, fakePassword);
 		expect(response).toStrictEqual(new Ok(fakeCookie));
+	});
+});
+
+describe('GET auth/v1/user', () => {
+	const fakeId = 0;
+	it('returns NotFound given a id not assosicated with any user', async () => {
+		authServiceMock.getUser.mockResolvedValue(new UserNotFound());
+
+		const authController = createAuthController(authServiceMock);
+
+		const response = await authController.routes.userGetRequest.response({
+			id: fakeId,
+		});
+
+		expect(authServiceMock.getUser).toBeCalledTimes(1);
+		expect(authServiceMock.getUser).toBeCalledWith(fakeId);
+		expect(response).toStrictEqual(new NotFound());
+	});
+	it('returns Ok with user information given a id accosicated with a user', async () => {
+		authServiceMock.getUser.mockResolvedValue(
+			new ReturnedUser({
+				name: fakeName,
+				email: fakeEmail,
+				id: fakeId,
+				passwordHash: fakePassword,
+			}),
+		);
+
+		const authController = createAuthController(authServiceMock);
+
+		const response = await authController.routes.userGetRequest.response({
+			id: fakeId,
+		});
+
+		expect(authServiceMock.getUser).toBeCalledTimes(1);
+		expect(authServiceMock.getUser).toBeCalledWith(fakeId);
+		expect(response).toStrictEqual(
+			new Ok({
+				name: fakeName,
+				email: fakeEmail,
+				id: fakeId,
+			}),
+		);
 	});
 });
