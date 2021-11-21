@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import { getContext, setContext } from 'svelte';
 
 export class HttpClient {
-	private readonly baseUrl = process.env.BASE_URL ?? '';
+	private readonly baseUrl = process.env.API_URL ?? '';
 	token = '';
 	setToken(token: string) {
 		this.token = token;
