@@ -14,6 +14,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      BASE_URL: 'http://notarealhostithink.hola'
     steps:
       - uses: actions/checkout@v2
       - uses: azure/login@v1
