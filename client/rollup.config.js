@@ -7,6 +7,7 @@ import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
+import replace from '@rollup/plugin-replace';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -69,6 +70,9 @@ export default {
 		typescript({
 			sourceMap: !production,
 			inlineSources: !production,
+		}),
+		replace({
+			'process.env.API_URL': JSON.stringify(process.env.API_URL),
 		}),
 
 		// In dev mode, call `npm run start` once
