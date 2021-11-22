@@ -11,6 +11,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
+    "@rollup/plugin-replace": "^3.0.0",
     "@rollup/plugin-typescript": "^8.0.0",
     "@tsconfig/svelte": "^2.0.0",
     "@types/node": "^16.11.9",
@@ -33,6 +34,7 @@
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "autoprefixer": "^10.4.0",
     "http-status-codes": "^2.1.4",
     "live-server": "^1.1.0",
     "local-web-server": "^5.1.1",

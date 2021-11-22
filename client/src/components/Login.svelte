@@ -30,7 +30,7 @@
 	class="bg-yellow-300 w-screen h-screen flex flex-col items-center sm:justify-center px-5"
 >
 	<h1 class="text-yellow-500 font-bold text-6xl sm:text-8xl p-5">
-		Resturanteers	</h1>
+		Resturanteer</h1>
 	<div
 		class="bg-yellow-200 max-w-3xl rounded-lg container"
 	>

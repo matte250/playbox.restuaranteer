@@ -1,4 +1,4 @@
-import express, { NextFunction, request, Response } from 'express';
+import express, { NextFunction, Response } from 'express';
 import { createAuthController } from './services/auth/controller';
 import { createAuthRepository } from './services/auth/repository';
 import cookieParser from 'cookie-parser';

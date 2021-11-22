@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import { getContext, setContext } from 'svelte';
 
 export class HttpClient {
-	private readonly baseUrl = 'http://localhost:5000';
+	private readonly baseUrl = process.env.API_URL ?? '';
 	token = '';
 	setToken(token: string) {
 		this.token = token;
@@ -13,7 +13,7 @@ export class HttpClient {
 		method: 'get' | 'post',
 		data?: { body: any },
 	) {
-		const response = await fetch(`/api${path}`, {
+		const response = await fetch(`${this.baseUrl}/api${path}`, {
 			body: data?.body ? JSON.stringify(data.body) : undefined,
 			headers: new Headers({
 				'Content-Type': 'application/json',
