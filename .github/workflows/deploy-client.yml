@@ -5,8 +5,11 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+concurrency: 
+  group: "deploy-client"
+
 jobs:
-  deploy:
+  deploy-client:
     runs-on: ubuntu-latest
     env:
       API_URL: https://resturanteer.azurewebsites.net/

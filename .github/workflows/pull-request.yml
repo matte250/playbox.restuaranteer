@@ -11,6 +11,10 @@ on:
     branches: [ main ]
 
   workflow_dispatch:
+  
+concurrency: 
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   pr_build_server:
@@ -41,7 +45,7 @@ jobs:
 
       - name: 👷‍♂️ Build client
         working-directory: ./client
-        run: npm run dev
+        run: npm run build
 
   pr_test:
     runs-on: ubuntu-latest
