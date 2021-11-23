@@ -13,23 +13,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_STORAGE_AUTH }}
+
       - uses: azure/docker-login@v1
         with:
           login-server: resturanteer.azurecr.io
           username: ${{ secrets.AZR_USERNAME }}
           password: ${{ secrets.AZR_PASSWORD }}
+
       - name: Build and Push image
         run: |
           docker build ./server -t resturanteer.azurecr.io/resturanteerapi:${{ github.sha }}
           docker push resturanteer.azurecr.io/resturanteerapi:${{ github.sha }}
+
       - uses: azure/webapps-deploy@v2
         with:
           app-name: 'resturanteer'
           images: resturanteer.azurecr.io/resturanteerapi:${{ github.sha }}
+          
       - name: Azure logout
         run: |
           az logout

@@ -1,15 +1,9 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Deploy Client
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
   workflow_dispatch:
-
-  # Allows you to run this workflow manually from the Actions tab
 
 jobs:
   deploy:
@@ -18,15 +12,19 @@ jobs:
       API_URL: https://resturanteer.azurewebsites.net/
     steps:
       - uses: actions/checkout@v2
+
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_STORAGE_AUTH }}
+
       - name: npm ci
         working-directory: ./client
         run: npm ci
+
       - name: build static site
         working-directory: ./client
         run: npm run build
+        
       - name: publish to azure
         uses: azure/CLI@v1
         with:
