@@ -23,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: 👷‍♂️ Build server
-        working-directory: .
+        working-directory: ./server
         run: npm run build:dev
 
       - name: 🃏 Run jest
