@@ -11,7 +11,7 @@ on:
     branches: [ main ]
 
   workflow_dispatch:
-  
+
 concurrency: 
   group: ${{ github.head_ref }}
   cancel-in-progress: true
@@ -57,6 +57,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: 💤 Sleep because compose is slow
+        run: sleep 10
           
       - name: 🌍 Set up Env
         run: docker-compose up -d
