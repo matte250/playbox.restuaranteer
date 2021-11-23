@@ -23,7 +23,7 @@
     "url": "https://github.com/matte250/playbox.restuaranteer/issues"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "node --es-module-specifier-resolution=node --experimental-modules --loader ts-node/esm ./prisma/seed.ts"
   },
   "homepage": "https://github.com/matte250/playbox.restuaranteer#readme",
   "dependencies": {
