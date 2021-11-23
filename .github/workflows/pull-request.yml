@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: 🐋 Login to Docker Hubs
+      - name: 🐋 Login to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
