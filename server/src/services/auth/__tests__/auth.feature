@@ -16,7 +16,7 @@ Scenario: Create new user and get user
         """
     When method post
     Then status 200
-    And def id = response.result.id
+    And def id = response.result
     
     Given path 'user', id
     When method Get
