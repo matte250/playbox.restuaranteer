@@ -13,11 +13,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  pr_build_server:
     runs-on: ubuntu-latest
-    env: 
-      DATABASE_URL: "postgresql://postgres:secret@postgres:5432/resturanteer?schema=public"
-
     steps:
       - uses: actions/checkout@v2
       
@@ -25,17 +22,39 @@ jobs:
         working-directory: ./server
         run: npm ci
 
+      - name: 👷‍♂️ Build server
+        working-directory: .
+
       - name: 🃏 Run jest
         working-directory: ./server
         run:  npm run test:coverage
+
+  pr_build_client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: 📥 Download node dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: 👷‍♂️ Build client
+        working-directory: ./client
+
+  pr_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
       - name: 🐋 Login to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
       - name: 🌍 Set up Env
         run: docker-compose up -d
 
       - name: 🥋 Run Karate Tests
         run: ./runTests.sh
+
