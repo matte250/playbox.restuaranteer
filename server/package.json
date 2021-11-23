@@ -1,7 +1,7 @@
 {
   "name": "restuaranteer",
   "version": "1.0.0",
-  "description": "Collect a set of restuarant reviews to generate options.",
+  "description": "Collect a set of restaurant reviews to generate options.",
   "exports": "./dist/index.js",
   "type": "module",
   "scripts": {

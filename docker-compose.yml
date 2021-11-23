@@ -1,8 +1,11 @@
 version: "3.9"
 services:
   server:
+    depends_on:
+      - postgres
     build: 
       context: ./server
+      dockerfile: Dockerfile
     command: sh -c "npx prisma migrate deploy && npx prisma db seed && node --es-module-specifier-resolution=node dist/index.js"
     ports:
       - "3000:3000"
