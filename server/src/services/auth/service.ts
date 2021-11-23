@@ -12,7 +12,7 @@ import { ACCESS_TOKEN_SECRET } from '../../env';
 import { Email, numberTypeGuard, stringTypeGuard } from '../../typeguard';
 
 export class TokenCreated {
-	constructor(readonly token: string) {}
+	constructor(readonly token: string, readonly userId: number) {}
 }
 
 export class TokenCreationFailed {}
@@ -78,7 +78,10 @@ export const createAuthService = (authRepo: IAuthRepo): IAuthService => ({
 			email: user.email.value,
 		};
 
-		return new TokenCreated(jwt.sign(userSession, ACCESS_TOKEN_SECRET));
+		return new TokenCreated(
+			jwt.sign(userSession, ACCESS_TOKEN_SECRET),
+			user.id,
+		);
 	},
 	extractToken: (token) => {
 		let reason = 'unknown';

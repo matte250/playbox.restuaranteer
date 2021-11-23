@@ -1,7 +1,7 @@
 {
   "name": "restuaranteer",
   "version": "1.0.0",
-  "description": "Collect a set of restuarant reviews to generate options.",
+  "description": "Collect a set of restaurant reviews to generate options.",
   "exports": "./dist/index.js",
   "type": "module",
   "scripts": {
@@ -21,6 +21,9 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/matte250/playbox.restuaranteer/issues"
+  },
+  "prisma": { 
+    "seed": "node --es-module-specifier-resolution=node --loader ts-node/esm ./prisma/seed.ts"  
   },
   "homepage": "https://github.com/matte250/playbox.restuaranteer#readme",
   "dependencies": {

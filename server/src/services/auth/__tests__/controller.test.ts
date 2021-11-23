@@ -18,6 +18,7 @@ beforeEach(() => {
 const fakeEmail = new Email('test@test.test');
 const fakeName = 'name';
 const fakePassword = 'password';
+const fakeId = 0;
 
 describe('POST auth/v1/register', () => {
 	it('returns Conflict given a email that is already in use', async () => {
@@ -40,10 +41,10 @@ describe('POST auth/v1/register', () => {
 		);
 		expect(response).toStrictEqual(new Conflict());
 	});
-	it('returns Ok given a user was created', async () => {
+	it('returns Ok with a id(of created user) given a user was created', async () => {
 		authServiceMock.createUser.mockResolvedValue(
 			new UserCreated({
-				id: 0,
+				id: fakeId,
 				email: fakeEmail,
 				name: fakeName,
 				passwordHash: '',
@@ -65,7 +66,7 @@ describe('POST auth/v1/register', () => {
 			fakeEmail,
 			fakePassword,
 		);
-		expect(response).toStrictEqual(new Ok());
+		expect(response).toStrictEqual(new Ok(fakeId));
 	});
 });
 
@@ -85,9 +86,11 @@ describe('POST auth/v1/login', () => {
 		expect(response).toStrictEqual(new Conflict());
 	});
 
-	it('returns Ok with a cookie given signIn succeded', async () => {
+	it('returns Ok with a cookie and id(of signed in user) given signIn succeded', async () => {
 		const fakeCookie = 'cookie';
-		authServiceMock.signIn.mockResolvedValue(new TokenCreated(fakeCookie));
+		authServiceMock.signIn.mockResolvedValue(
+			new TokenCreated(fakeCookie, fakeId),
+		);
 
 		const authController = createAuthController(authServiceMock);
 
@@ -98,7 +101,9 @@ describe('POST auth/v1/login', () => {
 
 		expect(authServiceMock.signIn).toBeCalledTimes(1);
 		expect(authServiceMock.signIn).toBeCalledWith(fakeEmail, fakePassword);
-		expect(response).toStrictEqual(new Ok(fakeCookie));
+		expect(response).toStrictEqual(
+			new Ok({ token: fakeCookie, id: fakeId }),
+		);
 	});
 });
 
@@ -138,7 +143,7 @@ describe('GET auth/v1/user', () => {
 		expect(response).toStrictEqual(
 			new Ok({
 				name: fakeName,
-				email: fakeEmail,
+				email: fakeEmail.value,
 				id: fakeId,
 			}),
 		);

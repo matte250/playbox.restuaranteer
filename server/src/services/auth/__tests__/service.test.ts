@@ -189,7 +189,7 @@ describe('signIn()', () => {
 	it('returns TokenCreated when a user with a given email exists and password hash matches', async () => {
 		authRepositoryMock.getUserByEmail.mockResolvedValue(
 			new ReturnedUser({
-				id: 0,
+				id: fakeId,
 				name: fakeName,
 				email: fakeEmail,
 				passwordHash: 'PRETEND-HASH',
@@ -204,7 +204,9 @@ describe('signIn()', () => {
 		expect(authRepositoryMock.getUserByEmail).toHaveBeenCalledWith(
 			fakeEmail,
 		);
-		expect(signInResponse).toEqual(new TokenCreated(expect.anything()));
+		expect(signInResponse).toEqual(
+			new TokenCreated(expect.anything(), fakeId),
+		);
 	});
 });
 
