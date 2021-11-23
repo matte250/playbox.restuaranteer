@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 const runSeed = async () => {
 	// Users
-	prisma.user.create({
+	await prisma.user.create({
 		data: {
 			id: 0,
 			email: 'test@test.test',
