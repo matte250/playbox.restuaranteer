@@ -3,7 +3,7 @@ services:
   server:
     build: 
       context: ./server
-    command: npx prisma migrate && npx prisma db seed && node --es-module-specifier-resolution=node dist/index.js
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && node --es-module-specifier-resolution=node dist/index.js"
     ports:
       - "3000:3000"
     environment:
