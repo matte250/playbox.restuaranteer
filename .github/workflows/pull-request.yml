@@ -57,12 +57,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: 💤 Sleep because compose is slow
-        run: sleep 10
           
       - name: 🌍 Set up Env
         run: docker-compose up -d
+
+      - name: 💤 Sleep because compose is slow
+        run: sleep 10
 
       - name: 🥋 Run Karate Tests
         run: ./runTests.sh
