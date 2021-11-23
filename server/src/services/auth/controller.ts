@@ -42,7 +42,7 @@ export const createAuthController = (
 				if (cereateUserResult instanceof EmailAlreadyInUse)
 					return new Conflict();
 
-				return new Ok();
+				return new Ok(cereateUserResult.createdUser.id);
 			},
 		} as Route<IRegisterPostRequest>,
 		loginPostRequest: {
@@ -57,7 +57,10 @@ export const createAuthController = (
 				if (signInResult instanceof TokenCreationFailed)
 					return new Conflict();
 
-				return new Ok(signInResult.token);
+				return new Ok({
+					token: signInResult.token,
+					id: signInResult.userId,
+				});
 			},
 		} as Route<ILoginPostRequest>,
 		userGetRequest: {
@@ -69,7 +72,7 @@ export const createAuthController = (
 				if (getUserResult instanceof UserNotFound)
 					return new NotFound();
 				const { name, email } = getUserResult.user;
-				return new Ok({ name, email, id });
+				return new Ok({ name, email: email.value, id });
 			},
 		} as Route<IUserGetRequest>,
 	},
