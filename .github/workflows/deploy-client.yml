@@ -13,19 +13,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: azure/login@v1
+      - name: 🎫 Login to azure
+        uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_STORAGE_AUTH }}
 
-      - name: npm ci
+      - name: 📥 Download node dependencies
         working-directory: ./client
         run: npm ci
 
-      - name: build static site
+      - name: 👷‍♀️ Build static site
         working-directory: ./client
         run: npm run build
         
-      - name: publish to azure
+      - name: 🌐 Publish to azure
         uses: azure/CLI@v1
         with:
           inlineScript: |
