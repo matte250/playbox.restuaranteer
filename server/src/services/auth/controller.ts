@@ -34,15 +34,15 @@ export const createAuthController = (
 				password: stringTypeGuard(body.password),
 			}),
 			response: async ({ email, name, password }) => {
-				const cereateUserResult = await authService.createUser(
+				const createUserResult = await authService.createUser(
 					name,
 					email,
 					password,
 				);
-				if (cereateUserResult instanceof EmailAlreadyInUse)
+				if (createUserResult instanceof EmailAlreadyInUse)
 					return new Conflict();
 
-				return new Ok(cereateUserResult.createdUser.id);
+				return new Ok(createUserResult.createdUser.id);
 			},
 		} as Route<IRegisterPostRequest>,
 		loginPostRequest: {
