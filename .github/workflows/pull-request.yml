@@ -47,6 +47,6 @@ jobs:
       - name: 🗄️ Push DB schema and seed to Env
         run: docker exec playboxrestuaranteer_web_1 npx prisma migrate deploy
       - name: 🗄️ Seed DB
-        run: docker exec playboxrestuaranteer_web_1 npx prisma db seed
+        run: docker exec playboxrestuaranteer_web_1 node --es-module-specifier-resolution=node --experimental-modules --loader ts-node/esm ./prisma/seed.ts
       - name: 🥋 Run Karate Tests
         run: ./runTests.sh
