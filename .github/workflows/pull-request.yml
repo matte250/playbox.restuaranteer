@@ -24,6 +24,7 @@ jobs:
 
       - name: 👷‍♂️ Build server
         working-directory: .
+        run: npm run build:dev
 
       - name: 🃏 Run jest
         working-directory: ./server
@@ -40,6 +41,7 @@ jobs:
 
       - name: 👷‍♂️ Build client
         working-directory: ./client
+        run: npm run dev
 
   pr_test:
     runs-on: ubuntu-latest
