@@ -44,5 +44,8 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: 🌍 Set up Env
         run: docker-compose up -d
+
+      - name: whatever
+        run: docker logs playboxrestuaranteer_server_1
       - name: 🥋 Run Karate Tests
         run: ./runTests.sh
