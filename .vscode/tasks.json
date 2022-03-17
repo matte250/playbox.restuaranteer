@@ -43,11 +43,30 @@
         }
       },
       {
+        "label": "Start web",
+        "type": "shell",
+        "command": "npm",
+        "args": [
+          "run",
+          "dev"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/web"
+        },
+        "group": "test",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared",
+          "group": "services"
+        }
+      },
+      {
         "label": "Start all services",
         "dependsOn": [
           "Start server",
-          "Start client"
+          "Start web"
         ],
+        "group": "test",
         "presentation": {
           "group": "services",
           "focus": false,
