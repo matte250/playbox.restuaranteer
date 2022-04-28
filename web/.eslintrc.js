@@ -10,6 +10,13 @@ module.exports = {
 		'plugin:react/recommended',
 		'airbnb',
 	],
+	settings: {
+		'import/resolver': {
+			node: {
+				extensions: ['.js', '.jsx', '.ts', '.tsx'],
+			},
+		},
+	},
 	rules: {
 		'react/jsx-filename-extension': [
 			2,
@@ -25,5 +32,13 @@ module.exports = {
 		],
 		'react/jsx-indent-props': ['error', 'tab'],
 		'react/react-in-jsx-scope': 'off',
+		'implicit-arrow-linebreak': 'off',
+		'react/function-component-definition': [
+			'error',
+			{
+				namedComponents: 'arrow-function',
+				unnamedComponents: 'arrow-function',
+			},
+		],
 	},
 };

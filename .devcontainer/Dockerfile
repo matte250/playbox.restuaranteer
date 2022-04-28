@@ -1,4 +1,4 @@
-FROM node:16.11 AS builder
+FROM node:18.0 AS builder
 
 RUN apt-get update && \
     apt-get -y install default-jre
